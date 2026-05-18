@@ -8,11 +8,7 @@ __pycache__/
 venv/
 env/
 
-# Synthetic test artifacts (regenerated on demand)
-examples/feed.synthetic.txt
-examples/expected.synthetic.jsonl
-
-# Benchmark logs (live test output)
+# Benchmark logs (live test output — appended to on every $0.08+ run)
 tests/bench_log.jsonl
 
 # OS / editor

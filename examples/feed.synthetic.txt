@@ -1,0 +1,113 @@
+MANIFEST {"node": "h100-04", "vfio_passthrough": false, "gpu_count": 8}
+SIGNAL s-001
+[1237346.019] NVRM: Xid (PCI:0000:32:00.0): 48, pid=1234, name=python3, Ch 00000010
+END
+SIGNAL s-002
+[1235775.345] NVRM: Xid (PCI:0000:20:00.0): 79, pid=1234, name=python3, Ch 00000010
+END
+SIGNAL s-003
+[1238304.812] NVRM: Xid (PCI:0000:8e:00.0): 92, pid=1234, name=python3, Ch 00000010
+END
+SIGNAL s-004
+[1237757.965] kernel: Watchdog detected hard LOCKUP on cpu 26
+END
+SIGNAL s-005
+[1236939.283] kernel: mlx5_core 0000:28:00.0: mlx5_health_report:115 firmware fatal error
+END
+MANIFEST {"node": "h100-12", "vfio_passthrough": false, "gpu_count": 8}
+SIGNAL r-001
+[1234957.924] NVRM: Xid (PCI:0000:1e:00.0): 48, pid=1234
+END
+SIGNAL r-pad
+[1238179.85] kernel: BUG: soft lockup - CPU#85 stuck for 23s
+END
+SIGNAL r-002
+[1241805.287] NVRM: GPU at PCI:0000:1e:00.0 has fallen off the bus
+END
+MANIFEST {"node": "h100-vfio-01", "vfio_passthrough": true, "gpu_count": 8}
+SIGNAL v-001
+[1235689.823] systemd: nvidia-fabricmanager.service: Unit not found.
+END
+SIGNAL v-002
+[1237221.146] NVRM: SXid (PCI:0000:8a:00.0): 20034, NVSWITCH_FATAL_LINK_ERROR
+END
+SIGNAL v-003
+[1239079.724] NVRM: Xid (PCI:0000:6e:00.0): 46, pid=1234, name=python3, Ch 00000010
+END
+MANIFEST {"node": "h100-vfio-01", "vfio_passthrough": false, "gpu_count": 8}
+SIGNAL v-004
+[1237628.602] kernel: systemd: nvidia-fabricmanager.service: Unit not found.
+END
+MANIFEST {"node": "h100-77", "vfio_passthrough": false, "gpu_count": 8}
+SIGNAL u-001
+[1235015.83] NVRM: Xid (PCI:0000:5d:00.0): 200, pid=4321
+END
+SIGNAL u-002
+[1235274.861] NVRM: Xid (PCI:0000:8a:00.0): 201, pid=4321
+END
+SIGNAL u-003
+[1236507.955] kernel: NVRM: Xid (PCI:0000:21:00.0): 46, pid=9 env=AWS_SECRET_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE app=trainer
+END
+SIGNAL u-004
+[1234500.0] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234500.1] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234500.2] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234500.3] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234500.4] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234500.5] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234500.6] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234500.7] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234500.8] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234500.9] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234501.0] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234501.1] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234501.2] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234501.3] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234501.4] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234501.5] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234501.6] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234501.7] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234501.8] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234501.9] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234502.0] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234502.1] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234502.2] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234502.3] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234502.4] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234502.5] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234502.6] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234502.7] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234502.8] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234502.9] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234503.0] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234503.1] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234503.2] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234503.3] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234503.4] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234503.5] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234503.6] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234503.7] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234503.8] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234503.9] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234504.0] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234504.1] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234504.2] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234504.3] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234504.4] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234504.5] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234504.6] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234504.7] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234504.8] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234504.9] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234505.0] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234505.1] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234505.2] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234505.3] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234505.4] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234505.5] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+[1234505.6] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#0
+[1234505.7] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#1
+[1234505.8] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#2
+[1234505.9] EDAC MC0: 1 CE memory read error on CPU_SrcID#0 DIMM#3
+END
+SHUTDOWN

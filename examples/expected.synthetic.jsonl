@@ -1,0 +1,16 @@
+{"signal_id": "s-001", "note": "known Xid 48 \u2192 critical", "expected_findings": [{"family": "XID", "code": 48, "name": "ECC_DBE", "severity": "critical", "action": "reset-gpu", "bdf": "0000:32:00.0"}]}
+{"signal_id": "s-002", "note": "known Xid 79 \u2192 critical", "expected_findings": [{"family": "XID", "code": 79, "name": "FALLEN_OFF_BUS", "severity": "critical", "action": "reboot-node", "bdf": "0000:20:00.0"}]}
+{"signal_id": "s-003", "note": "known Xid 92 \u2192 warning", "expected_findings": [{"family": "XID", "code": 92, "name": "EXCESSIVE_SBE", "severity": "warning", "action": "monitor", "bdf": "0000:8e:00.0"}]}
+{"signal_id": "s-004", "note": "log \u2192 HARD_LOCKUP", "expected_findings": [{"family": "HARD_LOCKUP", "severity": "critical"}]}
+{"signal_id": "s-005", "note": "log \u2192 MLX5_FW_FATAL", "expected_findings": [{"family": "MLX5_FW_FATAL", "severity": "critical", "bdf": "0000:28:00.0"}]}
+{"signal_id": "r-001", "note": "RMA pair (1/2): Xid 48", "expected_findings": [{"family": "XID", "code": 48, "name": "ECC_DBE", "severity": "critical", "action": "reset-gpu", "bdf": "0000:1e:00.0"}]}
+{"signal_id": "r-pad", "note": "log \u2192 SOFT_LOCKUP", "expected_findings": [{"family": "SOFT_LOCKUP", "severity": "warning"}]}
+{"signal_id": "r-002", "note": "RMA pair (2/2): bus-down on same BDF \u2192 rma_candidate=true", "expected_findings": [{"family": "GPU_BUS_DOWN", "severity": "critical", "bdf": "0000:1e:00.0", "rma_candidate": true}]}
+{"signal_id": "v-001", "note": "VFIO on \u2192 fabric-manager-not-running suppressed", "expected_findings": []}
+{"signal_id": "v-002", "note": "VFIO on \u2192 solo SXid suppressed", "expected_findings": []}
+{"signal_id": "v-003", "note": "known Xid 46 \u2192 critical", "expected_findings": [{"family": "XID", "code": 46, "name": "GPU_TIMEOUT", "severity": "critical", "action": "reset-gpu", "bdf": "0000:6e:00.0"}]}
+{"signal_id": "v-004", "note": "log \u2192 NVIDIA_FABRIC_MANAGER_NOT_RUNNING", "expected_findings": [{"family": "NVIDIA_FABRIC_MANAGER_NOT_RUNNING", "severity": "warning"}]}
+{"signal_id": "u-001", "note": "unknown Xid 200 \u2192 must not invent severity", "expected_findings": [{"family": "UNKNOWN_XID", "code": 200, "severity": "warning", "action": "escalate-for-review", "bdf": "0000:5d:00.0"}]}
+{"signal_id": "u-002", "note": "unknown Xid 201 \u2192 must not invent severity", "expected_findings": [{"family": "UNKNOWN_XID", "code": 201, "severity": "warning", "action": "escalate-for-review", "bdf": "0000:8a:00.0"}]}
+{"signal_id": "u-003", "note": "secret-bearing line \u2192 verbatim scrubbed", "expected_findings": [{"family": "XID", "code": 46, "name": "GPU_TIMEOUT", "severity": "critical", "action": "reset-gpu", "bdf": "0000:21:00.0", "_verbatim_must_not_contain": "AWS_SECRET_ACCESS_KEY=AKIAIOSFODNN7EXAMPLE"}]}
+{"signal_id": "u-004", "note": "burst of 60 EDAC_CE \u2192 aggregate, truncated if >50", "expected_findings": [{"family": "EDAC_CE", "severity": "warning", "count": 60, "truncated": true}]}
