@@ -1,0 +1,138 @@
+{
+  "Finding": [
+    "code",
+    "severity",
+    "confidence",
+    "category",
+    "title",
+    "description",
+    "action,omitempty",
+    "evidence,omitempty",
+    "source_artifacts,omitempty",
+    "issue_fingerprint,omitempty",
+    "-"
+  ],
+  "XidEvent": [
+    "bdf",
+    "code",
+    "is_sxid,omitempty",
+    "name",
+    "description",
+    "severity",
+    "requires_reset",
+    "action",
+    "count",
+    "recovery_action,omitempty"
+  ],
+  "hwmonChip": [
+    "name",
+    "path",
+    "fans,omitempty",
+    "temps,omitempty",
+    "voltages,omitempty"
+  ],
+  "hwmonFan": [
+    "label,omitempty",
+    "rpm",
+    "alarm"
+  ],
+  "hwmonTemp": [
+    "label,omitempty",
+    "input_mc",
+    "crit_mc,omitempty",
+    "alarm"
+  ],
+  "hwmonVolt": [
+    "label,omitempty",
+    "input_mv",
+    "alarm"
+  ],
+  "thermalZone": [
+    "type",
+    "temp_mc",
+    "trip_points,omitempty"
+  ],
+  "tripPoint": [
+    "type",
+    "temp_mc"
+  ],
+  "thermalStatus": [
+    "hwmon",
+    "thermal_zones",
+    "cpu_throttle,omitempty"
+  ],
+  "cpuThrottle": [
+    "package_events_total",
+    "core_events_total",
+    "packages,omitempty",
+    "cores,omitempty"
+  ],
+  "throttlePackage": [
+    "package_id",
+    "events"
+  ],
+  "throttleCore": [
+    "package_id",
+    "core_id",
+    "events"
+  ],
+  "StructuredError": [
+    "code",
+    "message",
+    "artifact_path,omitempty"
+  ],
+  "SkipReason": [
+    "reason",
+    "detail",
+    "artifact_path,omitempty"
+  ],
+  "pcieDeviceErrors": [
+    "bdf",
+    "vendor,omitempty",
+    "device,omitempty",
+    "class,omitempty",
+    "fatal,omitempty",
+    "nonfatal,omitempty",
+    "correctable,omitempty"
+  ],
+  "pcieAERStatus": [
+    "devices"
+  ],
+  "pcieLinkDevice": [
+    "bdf",
+    "vendor,omitempty",
+    "device,omitempty",
+    "class,omitempty",
+    "current_speed_gts,omitempty",
+    "max_speed_gts,omitempty",
+    "current_width,omitempty",
+    "max_width,omitempty",
+    "speed_degraded",
+    "width_degraded"
+  ],
+  "pcieLinkStatus": [
+    "degraded_devices"
+  ],
+  "sample": [
+    "severity"
+  ],
+  "edacMCData": [
+    "id",
+    "ue_count",
+    "ue_noinfo_count",
+    "ce_count",
+    "ce_noinfo_count",
+    "dimms,omitempty"
+  ],
+  "edacDIMMData": [
+    "id",
+    "label,omitempty",
+    "location,omitempty",
+    "ue_count",
+    "ce_count"
+  ],
+  "edacStatus": [
+    "present",
+    "memory_controllers"
+  ]
+}

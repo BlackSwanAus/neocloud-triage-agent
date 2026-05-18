@@ -1,0 +1,19 @@
+MANIFEST {"node": "h100-04", "vfio_passthrough": false, "gpu_count": 8}
+SIGNAL ev-0001
+[1234567.890] NVRM: Xid (PCI:0000:18:00): 48, pid=12345, name=python3, Ch 00000010
+END
+SIGNAL ev-0002
+[1234600.123] kernel: NVRM: GPU at PCI:0000:1a:00 has fallen off the bus.
+[1234600.456] kernel: pcieport 0000:17:00.0: AER: Uncorrectable Error received: 0000:1a:00.0
+END
+SIGNAL ev-0003
+[1234700.001] EDAC MC0: 1 CE memory read error on CPU_SrcID#0_MC#0_Chan#0_DIMM#1
+END
+SIGNAL ev-0004
+[1234800.500] kernel: Watchdog detected hard LOCKUP on cpu 12
+[1234800.501] kernel: Modules linked in: nvidia(POE) nvidia_uvm(POE) ...
+END
+SIGNAL ev-0005
+[1234900.000] mlx5_core 0000:c1:00.0: mlx5_health_report:115 fw fatal error
+END
+SHUTDOWN

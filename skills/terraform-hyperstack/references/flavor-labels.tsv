@@ -1,0 +1,7 @@
+label	meaning	effect
+network_optimised	SR-IOV high-speed networking	enables up to 350 Gbps inter-VM bandwidth
+no-hibernation	hibernation unsupported	cannot save VM state to disk; must keep running or destroy
+no-snapshot	snapshots unsupported	no point-in-time backup capability; no snapshot-based cloning
+local-storage-only	bootable-from-volume unsupported	must boot from local hypervisor storage; cannot boot from Ceph/shared volumes
+api-only	UI-hidden flavor	only discoverable/provisionable via API (e.g. -bigroot variants)
+no-reboot	hard reboot unsupported	cannot hard-reboot via API or UI; use Stop+Start instead

@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://hyperstack.cloud/schemas/ai-finding/v1",
+  "title": "Hyperstack AI Finding",
+  "description": "Canonical JSON structure for triage agent findings, validated on dashboard write-back.",
+  "type": "object",
+  "required": [
+    "archive_id",
+    "family",
+    "code",
+    "severity",
+    "confidence",
+    "action",
+    "evidence",
+    "count",
+    "provenance"
+  ],
+  "properties": {
+    "archive_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The support archive UUID this finding originated from"
+    },
+    "family": {
+      "type": "string",
+      "enum": [
+        "XID",
+        "ECC_CE",
+        "ECC_UE",
+        "EDAC_CE",
+        "EDAC_UE",
+        "PCIE_AER_FATAL",
+        "PCIE_AER_NONFATAL",
+        "PCIE_AER_CORRECTED",
+        "NVLINK_ERROR",
+        "NVLINK_CRC_RETRY",
+        "THERMAL_THROTTLE",
+        "THERMAL_SHUTDOWN",
+        "THERMAL_VIOLATION",
+        "POWER_OCP",
+        "POWER_OVP",
+        "KERNEL_PANIC",
+        "HARD_LOCKUP",
+        "SOFT_LOCKUP",
+        "HUNG_TASK",
+        "GPU_BUS_DOWN",
+        "NVIDIA_ASSERT",
+        "IPMI_SEL_CRITICAL",
+        "MCE_HW_ERROR",
+        "NVME_NOT_READY",
+        "NVME_CONTROLLER_DOWN",
+        "EXT4_FS_ERROR",
+        "XFS_CRC_ERROR",
+        "FS_REMOUNT_RO",
+        "SMART_REALLOCATED_SECTOR",
+        "SMART_PENDING_SECTOR",
+        "SMART_OFFLINE_UNCORRECTABLE",
+        "DRAM_RETIREMENT",
+        "DRAM_REMAP_FAILURE",
+        "UNCONTAINED_ECC",
+        "RECOVERED_DRAM_ERROR",
+        "RECOVERED_SRAM_ERROR",
+        "UNCORRECTABLE_DRAM",
+        "UNCORRECTABLE_SRAM",
+        "NVIDIA_FABRIC_MANAGER_NOT_RUNNING"
+      ],
+      "description": "Stable canonical family code. Never free-form."
+    },
+    "code": {
+      "oneOf": [
+        {
+          "type": "integer",
+          "description": "For XID and numeric families"
+        },
+        {
+          "type": "string",
+          "description": "For named families like SXid or host-side codes"
+        }
+      ],
+      "description": "Numeric XID code or symbolic name"
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["info", "warning", "alert", "critical"],
+      "description": "Hyperstack severity from escalation table"
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["low", "medium", "high"],
+      "description": "Trust in the evidence supporting this finding"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "none",
+        "monitor",
+        "restart-app",
+        "reset-gpu",
+        "reboot-node",
+        "escalate-for-review",
+        "contact-support",
+        "tune-workload"
+      ],
+      "description": "Canonical action verb. Routes finding downstream."
+    },
+    "evidence": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["artifact", "line"],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "description": "Archive-relative path, e.g. 'logs/kernel.log' or 'dcgm/dcgm-diagnostics.json'"
+          },
+          "line": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "1-indexed line number"
+          },
+          "verbatim": {
+            "type": "string",
+            "description": "First matched line (sanitized, no secrets)"
+          }
+        }
+      },
+      "description": "Array of cited evidence locations"
+    },
+    "count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of matching raw events aggregated into this finding"
+    },
+    "bdf": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\\.[0-9a-f]$",
+      "description": "Optional PCIe BDF address, e.g. '0004:04:00.0'"
+    },
+    "issue_fingerprint": {
+      "type": "string",
+      "description": "Copy of dashboard issue_fingerprint if citing existing issue"
+    },
+    "correlation": {
+      "type": "object",
+      "description": "Populated only if fingerprint-correlation skill ran",
+      "properties": {
+        "prior_occurrences": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Count from MCP search_by_fingerprint (excluding this archive)"
+        },
+        "multi_tenant_same_host": {
+          "type": "boolean",
+          "description": "True if ≥2 tenants on same dmi.system_serial"
+        },
+        "novelty_30d": {
+          "type": "boolean",
+          "description": "True if not seen fleet-wide in past 30 days"
+        }
+      }
+    },
+    "rma_verdict": {
+      "type": "object",
+      "description": "Populated only if rma-decision skill ran",
+      "required": ["verdict", "requires_human_approval"],
+      "properties": {
+        "verdict": {
+          "type": "string",
+          "enum": ["none", "monitor", "investigate", "rma-candidate", "rma-urgent"],
+          "description": "RMA decision from rma-decision skill. Never authored by agent."
+        },
+        "signals": {
+          "type": "array",
+          "minItems": 0,
+          "maxItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["family"],
+            "properties": {
+              "family": {
+                "type": "string",
+                "description": "The signal family (distinct from rma-decision's family field)"
+              },
+              "code_or_metric": {
+                "type": "string",
+                "description": "The specific code or metric value"
+              },
+              "evidence_ref": {
+                "type": "string",
+                "description": "Reference to finding_id that provided this signal"
+              }
+            }
+          },
+          "description": "The two distinct-family signals that triggered the verdict"
+        },
+        "requires_human_approval": {
+          "type": "boolean",
+          "enum": [true],
+          "description": "Always true for rma-candidate and rma-urgent"
+        }
+      }
+    },
+    "severity_change": {
+      "type": "object",
+      "description": "Present only if severity differs from catalog default",
+      "properties": {
+        "severity_upgraded_from": {
+          "type": "string",
+          "enum": ["info", "warning", "alert", "critical"]
+        },
+        "severity_downgraded_from": {
+          "type": "string",
+          "enum": ["info", "warning", "alert", "critical"]
+        },
+        "change_reason": {
+          "type": "string",
+          "description": "Short identifier, e.g. 'rate-breach-50-per-day' or 'vfio-fabric-isolation'"
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "model_version",
+        "prompt_hash",
+        "skills_loaded",
+        "mcp_tools_called",
+        "created_at"
+      ],
+      "properties": {
+        "model_version": {
+          "type": "string",
+          "description": "Claude model ID, e.g. 'claude-sonnet-4-6'"
+        },
+        "prompt_hash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$",
+          "description": "SHA256 of system prompt + skills loaded"
+        },
+        "skills_loaded": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "description": "Skill directory name + version, e.g. 'hyperstack-triage/v1.0'"
+          }
+        },
+        "mcp_tools_called": {
+          "type": "object",
+          "description": "Count by tool name",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "examples": [
+            {
+              "search_by_fingerprint": 3,
+              "preview_artifact": 7
+            }
+          ]
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 timestamp"
+        }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "archive_id": "550e8400-e29b-41d4-a716-446655440000",
+      "family": "XID",
+      "code": 48,
+      "severity": "critical",
+      "confidence": "high",
+      "action": "reset-gpu",
+      "evidence": [
+        {
+          "artifact": "logs/kernel.log",
+          "line": 1234,
+          "verbatim": "[12345.678901] NVRM: Xid (PCI:0004:04:00): 48, GPU has fallen off the bus."
+        }
+      ],
+      "count": 1,
+      "bdf": "0004:04:00.0",
+      "provenance": {
+        "model_version": "claude-sonnet-4-6",
+        "prompt_hash": "abc123def456abc123def456abc123def456abc123def456abc123def456ab",
+        "skills_loaded": [
+          "hyperstack-triage/v1.0",
+          "xid-catalog/v2.1",
+          "evidence-citation/v1.0"
+        ],
+        "mcp_tools_called": {
+          "preview_artifact": 1
+        },
+        "created_at": "2026-05-18T14:32:45Z"
+      }
+    }
+  ]
+}

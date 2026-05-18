@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Synthetic test artifacts (regenerated on demand)
+examples/feed.synthetic.txt
+examples/expected.synthetic.jsonl
+
+# Benchmark logs (live test output)
+tests/bench_log.jsonl
+
+# OS / editor
+.DS_Store
+*.swp
+*.swo
+.idea/
+.vscode/

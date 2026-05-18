@@ -1,0 +1,5 @@
+# Image matrix: derived from core_images data source at plan/apply time
+# Columns: image_name, os_type, distribution, version, arch, hypervisor_compat
+# Note: This file is populated at deploy time via data "hyperstack_core_images" query
+# TODO: Auto-populate via CI pipeline on every provider release
+image_name	os_type	distribution	version	arch	hypervisor_compat

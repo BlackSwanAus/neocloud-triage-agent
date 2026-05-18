@@ -1,0 +1,51 @@
+fingerprint_key	name	severity	regex
+kernel_panic	Kernel Panic	critical	(?i)\bkernel panic\b|\bpanic - not syncing\b
+soft_lockup	Soft Lockup	warning	(?i)BUG: soft lockup - CPU#\d+ stuck for \d+s
+nvidia_uvm_slab_leak	NVIDIA UVM Slab Leak	critical	(?i)(?:BUG \S+.*Objects remaining|Slab cache still has objects when called from deinit_chunk)
+kernel_bug	Kernel BUG	warning	(?i)\bBUG(?::|\s)
+kernel_stack_trace	Kernel Stack Trace	info	(?i)\bCall Trace:
+hardware_error	Hardware Error	critical	(?i)mce: \[Hardware Error\]
+fallen_off_bus	Fallen Off Bus	critical	(?i)fallen off the bus
+uvm_fatal_reboot	NVIDIA UVM Fatal	critical	(?i)NVRM:.*uvm encountered global fatal error
+nvrm_rpc_failure	NVRM RPC Failure	warning	(?i)NVRM:.*rpcSendMessage failed
+nvrm_driver_assertion	NVRM Driver Assertion	warning	(?i)NVRM:.*(?:Assertion failed|Check failed)
+nvidia_driver_warning	NVIDIA Driver Warning	warning	(?i)WARNING: CPU: \d+.*at nvidia/
+segfault	Segfault	warning	(?i)\bsegfault\b
+netdev_watchdog	NETDEV Watchdog TX Hung	warning	(?i)NETDEV WATCHDOG: \S+ \(\S+\): transmit queue \d+ timed out
+pcie_hotplug_timeout	PCIe Hotplug Timeout	warning	(?i)pcieport [0-9a-f:.]+: pciehp: Timeout on hotplug command
+timeout	Timeout	warning	(?i)\b(timeout|timed out)\b
+pcie_aer_fatal	PCIe AER Fatal	critical	(?i)PCIe Bus Error: severity=Uncorrectable \(Fatal\)
+edac_ue	EDAC Uncorrectable Error	critical	(?i)EDAC MC\d+: \d+ UE
+edac_mce	EDAC MCE Memory Error	critical	(?i)EDAC \w+ MC\d+: HANDLING MCE MEMORY ERROR
+ghes_fatal	GHES Fatal Hardware Error	critical	(?i)\{[^}]*\}\[Hardware Error\]:.*event severity: fatal
+memory_failure	Memory Failure (hwpoison)	critical	(?i)Memory failure: 0x[0-9a-f]+:
+nvme_controller_down	NVMe Controller Down	critical	(?i)nvme nvme\d+: controller is down
+nvme_not_ready	NVMe Device Not Ready	critical	(?i)nvme nvme\d+: Device not ready; aborting
+scsi_medium_error	SCSI Medium Error	critical	(?i)Sense Key\s*:\s*Medium Error
+scsi_hw_error	SCSI Hardware Error	critical	(?i)Sense Key\s*:\s*Hardware Error
+block_io_error	Block I/O Error	critical	(?i)blk_update_request: I/O error, dev
+fs_readonly	Filesystem Read-Only	critical	(?i)Remounting filesystem read-only
+sata_link_down	SATA Link Down	critical	(?i)ata\d+: SATA link down
+comreset_failed	COMRESET Failed	critical	(?i)ata\d+(?:\.\d+)?: COMRESET failed
+hard_lockup	NMI Hard Lockup	critical	(?i)Watchdog detected hard LOCKUP on cpu \d+
+mlx5_fw_fatal	MLX5 Firmware Fatal	critical	(?i)mlx5_core [0-9a-f:.]+:.*firmware fatal error
+container_manifest_unknown	Container Manifest Unknown	warning	(?i)manifest unknown
+container_layer_failure	Container Layer Failure	critical	(?i)(failed to register layer|layer does not exist)
+nvidia_container_cli_error	NVIDIA Container CLI Error	critical	(?i)nvidia-container-cli:.*nvml error
+pcie_aer_nonfatal	PCIe AER Non-Fatal	warning	(?i)PCIe Bus Error: severity=Uncorrectable \(Non-Fatal\)
+pcie_aer_correctable	PCIe AER Correctable	warning	(?i)PCIe Bus Error: severity=Corrected
+edac_ce	EDAC Correctable Error	warning	(?i)EDAC MC\d+: \d+ CE
+ghes_correctable	GHES Correctable Error	warning	(?i)\{[^}]*\}\[Hardware Error\]:.*event severity: (corrected|recoverable)
+bert_error	BERT Previous Boot Error	warning	(?i)BERT: Error records from previous boot
+cpu_thermal	CPU Thermal Throttle	warning	(?i)CPU\d+: (?:Package|Core) temperature above threshold
+nvme_io_error	NVMe I/O Error	warning	(?i)(?:I/O error, dev nvme\d+n\d+|nvme nvme\d+: I/O error)
+nvme_reset	NVMe Controller Reset	warning	(?i)nvme nvme\d+: .*(?:timeout, reset controller|resetting controller)
+ata_failed_cmd	ATA Failed Command	warning	(?i)ata\d+\.\d+: failed command:
+ata_hard_reset	ATA Hard Reset	warning	(?i)ata\d+: hard resetting link
+ras_page_retire	RAS Page Retirement	warning	(?i)RAS: Soft-offlining pfn:
+rcu_stall	RCU Stall	warning	(?i)rcu:.*detected stalls on CPUs
+hung_task	Hung Task	warning	(?i)INFO: task .+ blocked for more than \d+ seconds
+ext4_error	EXT4 Error	warning	(?i)EXT4-fs error \(device
+xfs_crc_error	XFS CRC Error	warning	(?i)XFS \(\S+\): Metadata CRC error
+btrfs_csum	BTRFS Checksum Error	warning	(?i)BTRFS.*csum failed
+error_fail	Error/Fail	info	(?i)\b(error|failed|failure)\b

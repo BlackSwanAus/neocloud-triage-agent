@@ -1,0 +1,110 @@
+code	name	description	severity	requires_reset	action
+8	ROBUST_CHANNEL_FIFO_ERROR_IDLE_TIMEOUT	GPU stopped processing	warning	False	Restart application
+11	ROBUST_CHANNEL_GR_ERROR_MISSING_HW	Invalid or corrupted push buffer stream	warning	False	Restart application
+13	ROBUST_CHANNEL_GR_EXCEPTION___ROBUST_CHANNEL_GR_ERROR_SW_NOTIFY	Graphics Engine Exception	warning	False	Restart application
+14	ROBUST_CHANNEL_FAKE_ERROR	Unused	info	False	No action required
+25	ROBUST_CHANNEL_GR_ILLEGAL_NOTIFY	Invalid or illegal push buffer stream	warning	False	Restart application
+31	ROBUST_CHANNEL_FIFO_ERROR_MMU_ERR_FLT	GPU memory page fault	warning	False	Restart application
+32	ROBUST_CHANNEL_PBDMA_ERROR	Invalid or corrupted push buffer stream	warning	False	Restart application
+37	ROBUST_CHANNEL_FECS_ERR_UNIMP_FIRMWARE_METHOD	Driver firmware error	info	False	No action required
+38	ROBUST_CHANNEL_FECS_ERR_WATCHDOG_TIMEOUT	Driver firmware error	info	False	No action required
+39	ROBUST_CHANNEL_CE0_ERROR	Copy Engine Exception	warning	False	Restart application
+40	ROBUST_CHANNEL_CE1_ERROR	Copy Engine Exception	warning	False	Restart application
+41	ROBUST_CHANNEL_CE2_ERROR	Copy Engine Exception	warning	False	Restart application
+43	ROBUST_CHANNEL_RESETCHANNEL_VERIF_ERROR	GPU stopped processing	info	False	No action required
+44	ROBUST_CHANNEL_GR_FAULT_DURING_CTXSW	Graphics Engine fault during context switch	info	False	No action required
+45	ROBUST_CHANNEL_PREEMPTIVE_REMOVAL	Preemptive cleanup, due to previous errors -- Most likely to see when running multiple cuda applications and hitting a DBE	warning	False	Contact support
+46	ROBUST_CHANNEL_GPU_TIMEOUT_ERROR	GPU stopped processing	critical	True	Reset GPU
+48	ROBUST_CHANNEL_GPU_ECC_DBE	Double Bit ECC Error	warning	False	Contact support
+54	SILENT_RUNNING_PWR_REDUCED_CLOCKING	Auxiliary power is not connected to the GPU board	warning	False	Contact support
+60	ROBUST_CHANNEL_SEC2_ERROR	Video processor exception	warning	False	Restart application
+62	PMU_HALT_ERROR	Internal micro-controller halt (newer drivers)	critical	True	Reset GPU
+63	INFOROM_DRAM_RETIREMENT_EVENT	GPU memory remapping event	info	False	No action required
+64	INFOROM_DRAM_RETIREMENT_FAILURE	GPU memory remapping failure	critical	True	Reset GPU
+66	ROBUST_CHANNEL_FECS_ERR_REG_ACCESS_VIOLATION	Illegal access by driver	info	False	No action required
+67	ROBUST_CHANNEL_FECS_ERR_VERIF_VIOLATION	Illegal access by driver	info	False	No action required
+68	ROBUST_CHANNEL_NVDEC0_ERROR	NVDEC0 Exception	warning	False	Restart application
+69	ROBUST_CHANNEL_GR_CLASS_ERROR	Graphics Engine class error	warning	False	Restart application
+70	ROBUST_CHANNEL_CE3_ERROR	CE3: Unknown Error	warning	False	Restart application
+71	ROBUST_CHANNEL_CE4_ERROR	CE4: Unknown Error	warning	False	Restart application
+72	ROBUST_CHANNEL_CE5_ERROR	CE5: Unknown Error	warning	False	Restart application
+74	NVLINK_ERROR	NVLINK Error	warning	False	Contact support
+75	ROBUST_CHANNEL_CE6_ERROR	CE6: Unknown Error	warning	False	Restart application
+76	ROBUST_CHANNEL_CE7_ERROR	CE7: Unknown Error	warning	False	Restart application
+77	ROBUST_CHANNEL_CE8_ERROR	CE8: Unknown Error	warning	False	Restart application
+78	VGPU_START_ERROR	vGPU Start Error	warning	False	Contact support
+79	ROBUST_CHANNEL_GPU_HAS_FALLEN_OFF_THE_BUS	GPU has fallen off the bus	critical	True	Reboot node
+80	PBDMA_PUSHBUFFER_CRC_MISMATCH	Corrupted data sent to GPU	warning	False	Restart application
+82	ROBUST_CHANNEL_NVJPG0_ERROR	NVJPG0 Error	warning	False	Restart application
+83	ROBUST_CHANNEL_NVDEC1_ERROR	NVDEC1 Error	warning	False	Restart application
+84	ROBUST_CHANNEL_NVDEC2_ERROR	NVDEC2 Error	warning	False	Restart application
+85	ROBUST_CHANNEL_CE9_ERROR	CE9: Unknown Error	warning	False	Restart application
+86	ROBUST_CHANNEL_OFA0_ERROR	OFA Exception	warning	False	Restart application
+88	ROBUST_CHANNEL_NVDEC3_ERROR	NVDEC3 Error	warning	False	Restart application
+89	ROBUST_CHANNEL_NVDEC4_ERROR	NVDEC4 Error	warning	False	Restart application
+92	EXCESSIVE_SBE_INTERRUPTS	High single-bit ECC error rate	info	False	No action required
+93	INFOROM_ERASE_LIMIT_EXCEEDED	Non-fatal violation of provisioned InfoROM wear limit	info	False	No action required
+94	ROBUST_CHANNEL_CONTAINED_ERROR	Contained memory error	warning	False	Restart application
+95	ROBUST_CHANNEL_UNCONTAINED_ERROR	Uncontained memory error	critical	True	Reset GPU
+96	ROBUST_CHANNEL_NVDEC5_ERROR	NVDEC5 Error	warning	False	Restart application
+97	ROBUST_CHANNEL_NVDEC6_ERROR	NVDEC6 Error	warning	False	Restart application
+98	ROBUST_CHANNEL_NVDEC7_ERROR	NVDEC7 Error	warning	False	Restart application
+99	ROBUST_CHANNEL_NVJPG1_ERROR	NVJPG1 Error	warning	False	Restart application
+100	ROBUST_CHANNEL_NVJPG2_ERROR	NVJPG2 Error	warning	False	Restart application
+101	ROBUST_CHANNEL_NVJPG3_ERROR	NVJPG3 Error	warning	False	Restart application
+102	ROBUST_CHANNEL_NVJPG4_ERROR	NVJPG4 Error	warning	False	Restart application
+103	ROBUST_CHANNEL_NVJPG5_ERROR	NVJPG5 Error	warning	False	Restart application
+104	ROBUST_CHANNEL_NVJPG6_ERROR	NVJPG6 Error	warning	False	Restart application
+105	ROBUST_CHANNEL_NVJPG7_ERROR	NVJPG7 Error	warning	False	Restart application
+106	SMBPBI_TEST_MESSAGE	SMBPBI Test Message	info	False	No action required
+107	SMBPBI_TEST_MESSAGE_SILENT	SMBPBI Test Message Silent	info	False	No action required
+108	NVLINK_REMOTE_TRANSLATION_ERROR	Unused	info	False	No action required
+109	ROBUST_CHANNEL_CTXSW_TIMEOUT_ERROR	Context Switch Timeout Error	critical	True	Reset GPU
+110	SEC_FAULT_ERROR	Security Fault Error	critical	True	Reset GPU
+119	GSP_RPC_TIMEOUT	GSP RPC Timeout	critical	True	Reset GPU
+120	GSP_ERROR	GSP Error	critical	True	Reset GPU
+121	C2C_ERROR	C2C Error	info	False	No action required
+126	ROBUST_CHANNEL_CE10_ERROR	CE10: Unknown Error	warning	False	Restart application
+127	ROBUST_CHANNEL_CE11_ERROR	CE11: Unknown Error	warning	False	Restart application
+128	ROBUST_CHANNEL_CE12_ERROR	CE12: Unknown Error	warning	False	Restart application
+129	ROBUST_CHANNEL_CE13_ERROR	CE13: Unknown Error	warning	False	Restart application
+130	ROBUST_CHANNEL_CE14_ERROR	CE14: Unknown Error	warning	False	Restart application
+131	ROBUST_CHANNEL_CE15_ERROR	CE15: Unknown Error	warning	False	Restart application
+132	ROBUST_CHANNEL_CE16_ERROR	CE16: Unknown Error	warning	False	Restart application
+133	ROBUST_CHANNEL_CE17_ERROR	CE17: Unknown Error	warning	False	Restart application
+134	ROBUST_CHANNEL_CE18_ERROR	CE18: Unknown Error	warning	False	Restart application
+135	ROBUST_CHANNEL_CE19_ERROR	CE19: Unknown Error	warning	False	Restart application
+136	ALI_TRAINING_FAIL	Link Training Failed	critical	True	Reset GPU
+137	NVLINK_PRIV_ERR	NVLink Privilege Error	info	False	No action required
+139	ROBUST_CHANNEL_OFA1_ERROR	OFA1 Error	warning	False	Restart application
+140	UNRECOVERABLE_ECC_ERROR_ESCAPE	ECC Unrecovered Error	critical	True	Reset GPU
+141	ROBUST_CHANNEL_FAST_PATH_ERROR	CUDA Fast Path Error	info	False	No action required
+142	ROBUST_CHANNEL_NVENC3_ERROR	NVENC3 Error	warning	False	Contact support
+143	GPU_INIT_ERROR	GPU Initialization Error	critical	True	Reset GPU
+144	NVLINK_SAW_ERROR	NVLINK: SAW Error	warning	False	Contact support
+145	NVLINK_RLW_ERROR	NVLINK: RLW Error	warning	False	Contact support
+146	NVLINK_TLW_ERROR	NVLINK: TLW Error	warning	False	Contact support
+147	NVLINK_TREX_ERROR	NVLINK: TREX Error	warning	False	Contact support
+148	NVLINK_NVLPW_CTRL_ERROR	NVLINK: NVLPW_CTRL Error	warning	False	Contact support
+149	NVLINK_NETIR_ERROR	NVLINK: NETIR Error	warning	False	Contact support
+150	NVLINK_MSE_ERROR	NVLINK: MSE Error	warning	False	Contact support
+151	ROBUST_CHANNEL_KEY_ROTATION_ERROR	Key rotation Error	warning	False	Contact support
+154	GPU_RECOVERY_ACTION_CHANGED	GPU Recovery Action Changed	warning	False	Contact support
+155	NVLINK_SW_DEFINED_ERROR	NVLINK: SW Defined Error	critical	True	Reset GPU
+156	RESOURCE_RETIREMENT_EVENT	Resource Retirement Event	critical	True	Reset GPU
+157	RESOURCE_RETIREMENT_FAILURE	Resource Retirement Failure	info	False	No action required
+158	GPU_FATAL_TIMEOUT	GPU Fatal Timeout	critical	True	Reset GPU
+159	ROBUST_CHANNEL_CHI_NON_DATA_ERROR	CHI Non-Data Error	warning	False	Contact support
+160	CHANNEL_RETIREMENT_EVENT	Channel Retirement Event	info	False	No action required
+161	CHANNEL_RETIREMENT_FAILURE	Channel Retirement Failure	info	False	No action required
+162	PSHC_REENGAGED	Power Smoothing HW Circuitry capability reengaged	warning	False	Contact support
+163	PSHC_DISENGAGED	Power Smoothing HW Circuitry capability disengaged	warning	False	Contact support
+164	PSHC_LOW_LIFETIME	Power Smoothing HW Circuitry low lifetime reached	warning	False	Contact support
+165	PSHC_ZERO_LIFETIME	Power Smoothing HW Circuitry lifetime exhausted	warning	False	Contact support
+166	NVLINK_SECURE_CRYPTO_ERR	CC traffic seen prior to link properly being configured for encrypted traffic	warning	False	Contact support
+167	PCIE_FATAL_TIMEOUT	PCIE_FATAL_TIMEOUT	warning	False	Contact support
+168	REDUCED_GPU_MEMORY_CAPACITY	Errors found in WPR (write protected region)	warning	False	Contact support
+169	SEC2_HALT_ERROR	Internal micro-controller halt	warning	False	Contact support
+170	NVLINK_SECURE_OTHER	Interrupt seen in CC mode	warning	False	Contact support
+171	UNCORRECTABLE_DRAM_ERROR	Additional to Xid 48 providing more details on particulars of fault to differentiate DRAM/SRAM	warning	False	Contact support
+172	UNCORRECTABLE_SRAM_ERROR	Additional to Xid 48 providing more details on particulars of fault to differentiate DRAM/SRAM	warning	False	Contact support

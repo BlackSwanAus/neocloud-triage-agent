@@ -1,0 +1,64 @@
+resource_type	attribute	type	required	computed	sensitive	description
+auth_role	id	int64	false	true	false	Role identifier
+auth_role	name	string	true	false	false	Role name
+auth_role	description	string	false	false	false	Role description
+auth_role	permissions	list	false	false	false	List of permission IDs assigned to role
+auth_role	created_at	string	false	true	false	Creation timestamp
+core_cluster	id	int64	false	true	false	Cluster identifier
+core_cluster	name	string	true	false	false	Cluster name
+core_cluster	environment_name	string	true	false	false	Environment where cluster resides
+core_cluster	kubernetes_version	string	true	false	false	Kubernetes version
+core_cluster	node_count	int64	true	false	false	Number of worker nodes
+core_cluster	flavor_name	string	true	false	false	Flavor for cluster nodes
+core_cluster	network_name	string	false	false	false	Virtual network for cluster
+core_cluster	created_at	string	false	true	false	Creation timestamp
+core_cluster	status	string	false	true	false	Cluster status
+core_environment	id	int64	false	true	false	Environment identifier
+core_environment	name	string	true	false	false	Environment name
+core_environment	region	string	true	false	false	Region code (CANADA-1, NORWAY-1, US-1)
+core_environment	description	string	false	false	false	Environment description
+core_environment	created_at	string	false	true	false	Creation timestamp
+core_keypair	id	int64	false	true	false	Key pair identifier
+core_keypair	name	string	true	false	false	Key pair name
+core_keypair	public_key	string	true	false	true	Public SSH key
+core_keypair	environment	string	false	false	false	Environment for key pair
+core_keypair	fingerprint	string	false	true	false	SSH key fingerprint
+core_keypair	created_at	string	false	true	false	Creation timestamp
+core_virtual_machine	id	int64	false	true	false	VM identifier
+core_virtual_machine	name	string	true	false	false	VM name
+core_virtual_machine	flavor_name	string	true	false	false	Flavor name (hardware configuration)
+core_virtual_machine	environment_name	string	true	false	false	Environment where VM is created
+core_virtual_machine	image_name	string	true	false	false	OS image name
+core_virtual_machine	assign_floating_ip	bool	false	false	false	Whether to assign public IP address
+core_virtual_machine	enable_port_randomization	bool	false	false	false	Enable SSH port randomization when floating IP assigned
+core_virtual_machine	create_bootable_volume	bool	false	false	false	Create bootable volume instead of local disk
+core_virtual_machine	callback_url	string	false	false	false	Webhook URL for VM lifecycle events
+core_virtual_machine	fixed_ip	string	false	true	false	Fixed private IP address
+core_virtual_machine	floating_ip	string	false	true	false	Assigned public IP address
+core_virtual_machine	floating_ip_status	string	false	true	false	Status of floating IP assignment
+core_virtual_machine	created_at	string	false	true	false	Creation timestamp
+core_virtual_machine	status	string	false	true	false	VM power status (running, stopped, etc)
+core_virtual_machine	environment	object	false	true	false	Environment details (computed)
+core_virtual_machine	flavor	object	false	true	false	Flavor details including GPU count and capabilities
+core_virtual_machine_sg_rule	id	int64	false	true	false	Security group rule identifier
+core_virtual_machine_sg_rule	vm_id	int64	true	false	false	Virtual machine ID
+core_virtual_machine_sg_rule	direction	string	true	false	false	Rule direction (ingress or egress)
+core_virtual_machine_sg_rule	protocol	string	true	false	false	Protocol (tcp, udp, icmp, or any)
+core_virtual_machine_sg_rule	port_range_min	int64	false	false	false	Minimum port number or ICMP type
+core_virtual_machine_sg_rule	port_range_max	int64	false	false	false	Maximum port number or ICMP code
+core_virtual_machine_sg_rule	cidr	string	false	false	false	CIDR block for rule
+core_virtual_machine_sg_rule	remote_group_id	int64	false	false	false	Remote security group ID
+core_virtual_machine_sg_rule	created_at	string	false	true	false	Creation timestamp
+core_volume	id	int64	false	true	false	Volume identifier
+core_volume	name	string	true	false	false	Volume name
+core_volume	environment_name	string	true	false	false	Environment where volume is created
+core_volume	size_gb	int64	true	false	false	Volume size in GB
+core_volume	volume_type	string	true	false	false	Storage class (SSD, HDD, etc)
+core_volume	description	string	false	false	false	Volume description
+core_volume	created_at	string	false	true	false	Creation timestamp
+core_volume	status	string	false	true	false	Volume status (available, in-use, etc)
+core_volume_attachment	id	int64	false	true	false	Attachment identifier
+core_volume_attachment	vm_id	int64	true	false	false	Virtual machine ID
+core_volume_attachment	volume_id	int64	true	false	false	Volume ID
+core_volume_attachment	device	string	false	true	false	Device path on VM (e.g. /dev/vdb)
+core_volume_attachment	created_at	string	false	true	false	Creation timestamp

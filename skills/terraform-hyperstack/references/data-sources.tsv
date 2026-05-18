@@ -1,0 +1,65 @@
+data_source_type	attribute	type	required	computed	sensitive	description
+auth_me	id	int64	false	true	false	Current user ID
+auth_me	username	string	false	true	false	Current username
+auth_me	email	string	false	true	false	Current user email
+auth_me	organization_id	int64	false	true	false	Organization ID
+auth_organization	id	int64	false	true	false	Organization ID
+auth_organization	name	string	true	false	false	Organization name
+auth_organization	created_at	string	false	true	false	Creation timestamp
+auth_permissions	id	int64	false	true	false	Permissions list (computed)
+auth_permissions	permissions	list	false	true	false	Available permissions
+auth_policies	id	int64	false	true	false	Policies list (computed)
+auth_policies	policies	list	false	true	false	Available policies
+auth_role	id	int64	true	false	false	Role identifier
+auth_role	name	string	false	true	false	Role name
+auth_role	description	string	false	true	false	Role description
+auth_role	permissions	list	false	true	false	Assigned permissions
+auth_role	created_at	string	false	true	false	Creation timestamp
+auth_roles	id	int64	false	true	false	Roles list (computed)
+auth_roles	roles	list	false	true	false	Available roles
+auth_roles	created_at	string	false	true	false	Creation timestamp
+auth_user_me_permissions	permissions	list	false	true	false	Current user permissions
+auth_user_permissions	user_id	int64	true	false	false	User identifier
+auth_user_permissions	permissions	list	false	true	false	User permissions
+core_clusters	id	int64	false	true	false	Clusters list (computed)
+core_clusters	clusters	list	false	true	false	Available Kubernetes clusters
+core_clusters_versions	id	int64	false	true	false	Versions list (computed)
+core_clusters_versions	versions	list	false	true	false	Available Kubernetes versions
+core_dashboard	id	int64	false	true	false	Dashboard data (computed)
+core_dashboard	status	string	false	true	false	System status
+core_dashboard	alerts	list	false	true	false	Active alerts
+core_environment	name	string	true	false	false	Environment name
+core_environment	id	int64	false	true	false	Environment identifier
+core_environment	region	string	false	true	false	Region code
+core_environment	features	object	false	true	false	Region features
+core_environment	created_at	string	false	true	false	Creation timestamp
+core_environments	id	int64	false	true	false	Environments list (computed)
+core_environments	environments	list	false	true	false	Available environments
+core_firewall_protocols	id	int64	false	true	false	Protocols list (computed)
+core_firewall_protocols	protocols	list	false	true	false	Available firewall protocols
+core_flavors	id	int64	false	true	false	Flavors list (computed)
+core_flavors	flavors	list	false	true	false	Available flavors
+core_flavors	filters	object	false	false	false	Optional filters (gpu_count, region, etc)
+core_gpus	id	int64	false	true	false	GPUs list (computed)
+core_gpus	gpus	list	false	true	false	Available GPU types
+core_images	id	int64	false	true	false	Images list (computed)
+core_images	images	list	false	true	false	Available OS images
+core_images	filters	object	false	false	false	Optional filters (os_type, distro, etc)
+core_keypair	name	string	true	false	false	Key pair name
+core_keypair	id	int64	false	true	false	Key pair identifier
+core_keypair	fingerprint	string	false	true	false	SSH key fingerprint
+core_keypair	created_at	string	false	true	false	Creation timestamp
+core_keypairs	id	int64	false	true	false	Keypairs list (computed)
+core_keypairs	keypairs	list	false	true	false	Available key pairs
+core_regions	id	int64	false	true	false	Regions list (computed)
+core_regions	regions	list	false	true	false	Available regions
+core_stocks	id	int64	false	true	false	Stock check (computed)
+core_stocks	region	string	true	false	false	Region to check inventory
+core_stocks	stocks	list	false	true	false	Flavor stock levels per region
+core_virtual_machines	id	int64	false	true	false	VMs list (computed)
+core_virtual_machines	virtual_machines	list	false	true	false	Available virtual machines
+core_virtual_machines	filters	object	false	false	false	Optional filters
+core_volume_types	id	int64	false	true	false	Types list (computed)
+core_volume_types	volume_types	list	false	true	false	Available storage classes
+core_volumes	id	int64	false	true	false	Volumes list (computed)
+core_volumes	volumes	list	false	true	false	Available volumes
