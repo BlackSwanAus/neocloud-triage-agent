@@ -38,6 +38,10 @@ from pathlib import Path
 
 try:
     from claude_agent_sdk import ClaudeSDKClient, ClaudeAgentOptions
+    from claude_agent_sdk.types import (
+        PermissionResultAllow,
+        PermissionResultDeny,
+    )
 except ImportError:
     sys.stderr.write(
         "claude-agent-sdk not installed. Run: pip install claude-agent-sdk\n"
@@ -48,6 +52,39 @@ except ImportError:
 AGENT_DIR = Path(__file__).resolve().parent
 SKILLS_DIR = AGENT_DIR / "skills"
 AGENT_MD = AGENT_DIR / "AGENT.md"
+
+# Default-deny tool gate. Whitelist read-only inspection tools the fallback path
+# needs (Read/Glob/Grep for catalog lookup). Everything else — shell, write,
+# sub-agent spawn, web fetch — denied so raw feed text (attacker-controllable
+# in production) cannot drive code execution.
+TRIAGE_TOOL_ALLOWLIST = frozenset({"Read", "Glob", "Grep"})
+
+# Explicit denylist as defense-in-depth alongside the callback. The CLI rejects
+# these before they reach the model, so even if the callback layer regresses,
+# these tools remain unreachable. Keep this list in sync as the Claude Code
+# tool surface evolves.
+TRIAGE_TOOL_DENYLIST = (
+    "Bash",
+    "BashOutput",
+    "KillBash",
+    "Write",
+    "Edit",
+    "MultiEdit",
+    "NotebookEdit",
+    "Task",
+    "TodoWrite",
+    "ExitPlanMode",
+    "WebFetch",
+    "WebSearch",
+)
+
+
+async def triage_tool_gate(tool_name, tool_input, _context):
+    if tool_name in TRIAGE_TOOL_ALLOWLIST:
+        return PermissionResultAllow(updated_input=tool_input)
+    return PermissionResultDeny(
+        message=f"tool {tool_name!r} not in triage allowlist",
+    )
 
 
 def build_system_prompt() -> str:
@@ -134,8 +171,24 @@ async def main_loop(feed: Path | None, model: str) -> int:
         model=model,
         system_prompt=build_system_prompt(),
         cwd=str(AGENT_DIR),
-        allowed_tools=["Read", "Glob", "Grep", "Bash"],
-        permission_mode="bypassPermissions",
+        # setting_sources=[] is the SECURITY-CRITICAL setting: it isolates the
+        # session from ~/.claude/settings.json. Without it, user-level
+        # permissions.allow (which typically grants Bash, Write, Task, etc.)
+        # leaks into the triage session and overrides allowed_tools.
+        setting_sources=[],
+        permission_mode="default",
+        # Under setting_sources=[], allowed_tools acts as a strict allowlist:
+        # the CLI rejects any tool not listed before it executes, even if the
+        # model attempts it.
+        allowed_tools=list(TRIAGE_TOOL_ALLOWLIST),
+        # Defense-in-depth: explicit denylist of known dangerous tools.
+        # Belt-and-suspenders alongside the allowlist.
+        disallowed_tools=list(TRIAGE_TOOL_DENYLIST),
+        # can_use_tool is plumbed but does not fire under CLI 2.1.143 + SDK
+        # 0.1.18 when tools are pre-allowed/denied. Kept as a no-cost extra
+        # layer for future CLI/SDK versions where it may become authoritative.
+        can_use_tool=triage_tool_gate,
+        max_turns=12,
     )
 
     # Wire input feed (stdin or named file/pipe).

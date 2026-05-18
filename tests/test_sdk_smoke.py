@@ -44,8 +44,18 @@ async def test_one_shot_query_returns_ok():
             "You are a test harness. Respond with the single word OK and nothing else. "
             "No punctuation, no preamble, no markdown."
         ),
-        permission_mode="bypassPermissions",
         allowed_tools=[],
+        disallowed_tools=[
+            "Bash",
+            "Write",
+            "Edit",
+            "NotebookEdit",
+            "Read",
+            "Glob",
+            "Grep",
+            "WebFetch",
+            "WebSearch",
+        ],
         model="claude-haiku-4-5-20251001",  # cheap + fast for smoke
         max_turns=1,
     )

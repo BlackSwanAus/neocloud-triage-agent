@@ -24,6 +24,10 @@ from claude_agent_sdk import (
     TextBlock,
 )
 
+import sys
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+from runner import TRIAGE_TOOL_ALLOWLIST, TRIAGE_TOOL_DENYLIST, triage_tool_gate
+
 AGENT_DIR = Path(__file__).resolve().parent.parent
 AGENT_MD = AGENT_DIR / "AGENT.md"
 BENCH_LOG = AGENT_DIR / "tests" / "bench_log.jsonl"
@@ -50,8 +54,11 @@ async def _run_one(signal_id: str, raw: str, model: str) -> dict:
     options = ClaudeAgentOptions(
         system_prompt=AGENT_MD.read_text(),
         cwd=str(AGENT_DIR),
-        permission_mode="bypassPermissions",
-        allowed_tools=["Read", "Glob", "Grep"],
+        setting_sources=[],
+        permission_mode="default",
+        allowed_tools=list(TRIAGE_TOOL_ALLOWLIST),
+        disallowed_tools=list(TRIAGE_TOOL_DENYLIST),
+        can_use_tool=triage_tool_gate,
         model=model,
         max_turns=12,
     )
