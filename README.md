@@ -1,172 +1,345 @@
 # Hyperstack Triage Agent
 
-A long-running Claude agent that consumes a feed of GPU-fleet signals (kernel logs,
-Xid events, manifest metadata) and emits structured AI findings.
+A long-running Claude agent that consumes a feed of GPU-fleet signals
+(kernel logs, NVIDIA Xid events, manifest metadata) and emits structured
+findings via the Claude Agent SDK.
 
-## Layout
+Not a production tool — an exploration of prompt-as-contract design, TDD
+against a non-deterministic backend, and measurement-driven prompt
+optimisation. See [`NOTICE.md`](NOTICE.md) for provenance.
+
+---
+
+## What it does
+
+### Pipeline (per signal)
 
 ```
-agent/
-├── AGENT.md              # Agent system prompt + operating loop contract
-├── runner.py             # Feed-driven loop (Claude Agent SDK)
-├── skills/               # Bundled skills (deployable form)
-│   ├── ai-finding-format/
-│   ├── critical-log-patterns/   (+ source-patterns.tsv canonical from Go)
-│   ├── evidence-citation/       (+ source-artifact-paths.txt canonical)
-│   ├── fingerprint-correlation/
-│   ├── hyperstack-triage/
-│   ├── rma-decision/
-│   ├── terraform-hyperstack/
-│   └── xid-catalog/             (+ source-codes.tsv canonical from Go)
-└── examples/
-    └── feed.sample.txt   # Five signals + shutdown
+                                       ┌────────────────────────┐
+SIGNAL <id>  ──►  classify  ──hit──►   │ inline hot table       │  ──►  emit FINDING
+   raw text       (1 turn)             │   • 21 Xid codes       │       (1 turn total)
+                                       │   • 19 log families    │
+                                       └────────────────────────┘
+                       │
+                       └── miss ──►  Read skills/<name>/references/...
+                                           │
+                                           ▼
+                                      classify, then emit FINDING
+                                      (2–3 turns total)
 ```
 
-The `references/source-*.{tsv,json,txt}` files in each skill are extracted from the
-gather-info Go source (`hyperstack-support-scripts`) and are the authoritative catalog.
-The `references/*.{tsv,md}` files are the curated subset with Hyperstack overrides.
-The agent prefers curated when both exist; falls back to canonical when not.
+For every block on the feed:
+
+1. **Classify.** Match the raw text against AGENT.md's two inlined catalogs.
+   - Numeric `Xid (PCI:<bdf>): <code>` events → look up `<code>` in the
+     21-entry Xid hot table to resolve `family`, `severity`, `action`.
+   - Kernel/syslog/journal lines → regex-match the 19 log family patterns
+     (kernel panic, hard lockup, GPU off-bus, EDAC UE/CE, PCIe AER, NVMe
+     controller down, MLX5 firmware fatal, EXT4/XFS errors, etc.).
+   - Misses fall back to a single `Read` of the canonical TSV in
+     `skills/xid-catalog/` or `skills/critical-log-patterns/`.
+
+2. **Extract BDF.** Any PCIe/GPU line gets its bus:device.function pulled out
+   with `[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-9a-f]` and attached to
+   `evidence.bdf`. Without a BDF the dashboard can't dedupe across archives,
+   so this is mandatory for GPU signals.
+
+3. **Apply context rules.** The sticky `MANIFEST` block sets archive-wide
+   context:
+   - `vfio_passthrough: true` suppresses `NVIDIA_FABRIC_MANAGER_NOT_RUNNING`
+     (it's expected when NVSwitch is passthrough'd to a guest).
+   - `vfio_passthrough: true` also suppresses solo SXid events — an SXid
+     without a matching GPU Xid on the same fabric within 10 s is the
+     fabric isolating itself correctly, not a fault.
+
+4. **Apply escalation thresholds.** Some families upgrade severity based on
+   rate (e.g. `EDAC_CE > 50/day` → `alert`, `PCIE_AER_CORRECTABLE > 50/24h`
+   → `alert`). Originals are preserved in `severity_upgraded_from`.
+
+5. **Aggregate.** Multiple matches of the same `(family, bdf)` collapse into
+   one finding with `count`, `first_seen`, `last_seen`. Hard cap of 50
+   findings per (family, bdf) per archive; past that, `truncated: true`.
+
+6. **Scrub.** The raw line that goes into `evidence.verbatim` runs through
+   secret-suppression regexes (AWS keys, bearer tokens, generic
+   `password=…`) — matches replaced with `<REDACTED>`.
+
+7. **Decide.** A `critical` severity authorises "investigate", **not** RMA.
+   RMA requires a second independent critical signal on the same BDF within
+   the archive. When satisfied, the second finding sets `rma_candidate: true`.
+
+8. **Emit.** One `FINDING <signal-id>` block per turn; one JSON object per
+   line inside; terminate with `END` and `READY`. The harness reads `READY`
+   as "ready for next signal".
+
+### Signal taxonomy
+
+| Family | Source | Example trigger |
+|---|---|---|
+| `XID` (codes 8–154) | NVRM driver | `NVRM: Xid (PCI:0000:18:00.0): 48` (ECC DBE → reset GPU) |
+| `KERNEL_PANIC` / `HARD_LOCKUP` / `SOFT_LOCKUP` | kernel | `Kernel panic - not syncing` |
+| `GPU_BUS_DOWN` | NVRM / pcieport | `GPU at PCI:… has fallen off the bus` |
+| `EDAC_UE` / `EDAC_CE` | EDAC | `EDAC MC0: 1 UE memory read error` |
+| `MCE_HW_ERROR` | mcelog | `mce: [Hardware Error]` |
+| `PCIE_AER_FATAL` / `_NONFATAL` / `_CORRECTABLE` | pcieport | `PCIe Bus Error: severity=Uncorrectable (Fatal)` |
+| `NVME_CONTROLLER_DOWN` / `NVME_NOT_READY` | nvme driver | `nvme nvme0: controller is down` |
+| `EXT4_FS_ERROR` / `XFS_CRC_ERROR` / `FS_REMOUNT_RO` | filesystem | `EXT4-fs error (device ...)` |
+| `MLX5_FW_FATAL` | mlx5 | `mlx5_core 0000:c1:00.0: ... firmware fatal error` |
+| `NVIDIA_FABRIC_MANAGER_NOT_RUNNING` | systemd | `nvidia-fabricmanager.service: Unit not found` (suppressed under VFIO) |
+| `UNKNOWN_XID` / `UNKNOWN_LOG` | fallback | code/pattern not in catalog → severity=warning, action=escalate-for-review |
+
+### Output schema
+
+Required fields:
+
+| Field | Type | Notes |
+|---|---|---|
+| `family` | string | From the catalog. `UNKNOWN_*` for unrecognised input. |
+| `severity` | `info` \| `warning` \| `critical` | From catalog; may be upgraded by thresholds. |
+| `action` | enum | `none` \| `monitor` \| `restart-app` \| `reset-gpu` \| `reboot-node` \| `escalate-for-review` \| `contact-support` |
+| `evidence.verbatim` | string | First matched line, secret-scrubbed. |
+
+Optional:
+
+| Field | Type | Notes |
+|---|---|---|
+| `code` | int | Xid numeric code |
+| `bdf` | string | PCI bus:device.function |
+| `count`, `first_seen`, `last_seen` | int / iso8601 | Aggregation metadata |
+| `truncated` | bool | True when count > 50 |
+| `rma_candidate` | bool | Second independent critical on same BDF |
+| `severity_upgraded_from` / `upgrade_reason` | string | Escalation audit trail |
+
+Forbidden in agent output (provenance is added by the harness, not the
+model): `prompt_hash`, `skills_loaded`, `model_version`, `archive_id`,
+`created_at`, `confidence`.
+
+### Skills bundled
+
+The agent ships with eight skill packs under `skills/`. Most operate as
+**reference fallback** — the model only Reads them on a hot-table miss.
+
+| Skill | Role | When consulted |
+|---|---|---|
+| `xid-catalog` | Xid code → name/severity/action | Code not in inlined hot table |
+| `critical-log-patterns` | Regex → log family/severity | Log line not matching inlined patterns |
+| `hyperstack-triage` | Operating procedure, escalation thresholds | Rate-based severity upgrade |
+| `evidence-citation` | Artifact paths, secret-scrub patterns | Building `evidence` block |
+| `ai-finding-format` | JSON schema + struct shapes | Output validation |
+| `rma-decision` | 2-signal RMA gate, decision tree | Confirming RMA candidacy |
+| `fingerprint-correlation` | Cross-archive dedup heuristics | Aggregate analysis (not single-signal) |
+| `terraform-hyperstack` | VM provisioning schema | Manifest/topology queries |
+
+Each skill has two flavours of reference data side-by-side: the curated
+`references/<name>.{tsv,md}` (selective, with operator overrides) and the
+canonical `references/source-<name>.{tsv,json,txt}` (extracted from the Go
+support binary — see [`NOTICE.md`](NOTICE.md)).
+
+---
+
+## Repository layout
+
+```
+.
+├── AGENT.md              Agent system prompt — read this before changing behaviour
+├── runner.py             Feed-driven loop (stdin or FIFO → ClaudeSDKClient)
+├── skills/               Eight bundled skill packs (xid-catalog, log-patterns, …)
+├── examples/
+│   ├── feed.sample.txt           Hand-written 5-signal feed
+│   ├── feed.synthetic.txt        Generated fixture (committed)
+│   ├── expected.synthetic.jsonl  Golden expectations (committed)
+│   ├── gen_synthetic.py          Deterministic generator (seed=42)
+│   └── validate.py               Runs runner + diffs against golden
+├── tests/
+│   ├── test_validator.py         Parser + matcher unit tests
+│   ├── test_validator_hit_dup.py Regression: each actual matches at most one expected
+│   ├── test_validate_timeout.py  Subprocess timeout
+│   ├── test_sdk_smoke.py         Live: SDK + Max-auth smoke
+│   ├── test_output_protocol.py   Live: model still emits FINDING/END/READY
+│   └── test_perf_baseline.py     Live: per-signal wall / turns / cost
+├── CLAUDE.md             Notes for future Claude Code sessions in this repo
+├── NOTICE.md             Provenance, attribution, what's authored vs derived
+└── LICENSE               MIT
+```
+
+See [`AGENT.md`](AGENT.md) for the system prompt and the full input/output
+contract. See [`CLAUDE.md`](CLAUDE.md) for working-in-the-repo conventions.
+
+---
 
 ## Install
 
-Proof-of-concept uses **Claude Max** credentials via the `claude` CLI — no API key.
+PoC uses **Claude Max** credentials via the `claude` CLI — no API key.
 
 ```bash
-# 1. Claude Code CLI (handles auth)
+# 1. Claude Code CLI (provides auth)
 npm i -g @anthropic-ai/claude-code
-claude login                     # opens browser → log in with Max account
+claude login                                  # opens browser, log in with Max
 
-# 2. Python SDK (uses the CLI's stored credentials)
-pip install claude-agent-sdk
+# 2. Python venv + SDK
+python3 -m venv .venv
+.venv/bin/pip install claude-agent-sdk pytest pytest-asyncio
 ```
 
-Verify auth:
+**Critical:** the `claude` CLI prefers `ANTHROPIC_API_KEY` over the stored Max
+session if both are present. To use Max, ensure the env var is **unset**:
+
 ```bash
-claude --version
-claude -p "say hi"               # should respond without prompting for key
+unset ANTHROPIC_API_KEY        # or set it empty in the run command
 ```
 
-The SDK shells out to `claude` for inference; if `claude` is logged in, the runner
-will use those Max credentials. Do **not** set `ANTHROPIC_API_KEY` — if it's set,
-the CLI prefers it over the Max session and you'll burn API credits instead.
+---
 
 ## Run
 
-Feed from stdin (interactive):
+Stdin feed:
 ```bash
-python runner.py < examples/feed.sample.txt
+.venv/bin/python runner.py < examples/feed.sample.txt
 ```
 
-Feed from a named pipe (production):
+FIFO feed (deployment style):
 ```bash
 mkfifo /var/run/triage.fifo
-python runner.py --feed /var/run/triage.fifo &
-# producer:
-tail -F /var/log/messages | log-to-signals.py > /var/run/triage.fifo
+.venv/bin/python runner.py --feed /var/run/triage.fifo &
+tail -F /var/log/messages | your-log-to-signal-shim > /var/run/triage.fifo
 ```
 
-Default model is **`claude-haiku-4-5-20251001`** — verified by benchmark to resolve
-hot Xids and known log patterns in **1 turn** when AGENT.md inlines the catalogs.
-Upgrade to Sonnet/Opus only for ambiguous cases:
+Override model:
 ```bash
-TRIAGE_MODEL=claude-sonnet-4-6 python runner.py < examples/feed.sample.txt
-TRIAGE_MODEL=claude-opus-4-7   python runner.py < examples/feed.sample.txt
+TRIAGE_MODEL=claude-sonnet-4-6 .venv/bin/python runner.py < feed.txt
 ```
 
-### Max-plan caveats (PoC only)
-
-- **Usage limits apply** — Max session has a 5-hour rolling cap; a continuous
-  triage loop can hit it. For long burns, pause the feed or downgrade to Haiku.
-- **No managed-agents endpoint** — the Managed Agents API requires a workspace API
-  key (`sk-ant-...`); Max credentials don't grant access. The local SDK path
-  (this `runner.py`) is the only path that works with Max auth.
-- **No prompt-cache billing visibility** — caching still happens, but you won't
-  see token accounting; Max is flat-rate within limits.
+---
 
 ## Feed protocol
 
-Newline-delimited. Each block is one of:
+Newline-delimited blocks. Three block types:
 
 ```
 SIGNAL <id>
-<raw log lines / Xid event / JSON>
+<raw lines: kernel log, Xid event, JSON, whatever>
 END
 ```
-
 ```
 MANIFEST {"vfio_passthrough": true, "node": "h100-04", ...}
 ```
-
 ```
 SHUTDOWN
 ```
 
-`MANIFEST` is sticky context (sets VFIO suppression etc.) until replaced.
-`SIGNAL` blocks trigger triage; the agent emits findings then `READY`.
-`SHUTDOWN` flushes and exits.
-
-## Output
-
-For each SIGNAL the agent emits to stdout:
+`MANIFEST` is sticky context (controls VFIO suppression, hostname tagging,
+etc.) until replaced. `SIGNAL` blocks trigger one round of triage and the
+agent answers with a `FINDING` block:
 
 ```
 FINDING <signal-id>
-{"family": "XID", "code": 48, "severity": "critical", "action": "reset-gpu", ...}
-{"family": "PCIE_AER_FATAL", "severity": "critical", "bdf": "0000:1a:00.0", ...}
+{"family": "XID", "code": 48, "severity": "critical", "action": "reset-gpu", "bdf": "0000:18:00.0", "evidence": {"verbatim": "..."}}
 END
 READY
 ```
 
-Zero-finding (benign / suppressed) signals emit just `END\nREADY`.
+Zero-finding (benign or suppressed) signals emit just `FINDING <id>\nEND\nREADY`.
 
-## Synthetic test harness
+---
 
-`examples/gen_synthetic.py` generates a deterministic feed plus a golden
-expectations file; `examples/validate.py` runs the agent against the feed and
-diffs findings against the golden.
+## Tests
 
 ```bash
-# Generate the synthetic feed + goldens (deterministic, seed=42)
-python examples/gen_synthetic.py --scenarios all
+# Unit suite — no model calls, ~1.5s, free
+.venv/bin/python -m pytest tests/ \
+  --ignore=tests/test_sdk_smoke.py \
+  --ignore=tests/test_output_protocol.py \
+  --ignore=tests/test_perf_baseline.py
 
-# Run agent + validate in one go (requires `claude login`)
-python examples/validate.py
-
-# Or capture runner output and validate offline (no Max usage)
-python runner.py < examples/feed.synthetic.txt > /tmp/run.out
-python examples/validate.py --offline /tmp/run.out
+# Live tests — hit the real model. Each one costs ~$0.02–$0.14 of Max usage.
+RUN_LIVE_AGENT_TESTS=1 ANTHROPIC_API_KEY= \
+  .venv/bin/python -m pytest tests/test_sdk_smoke.py tests/test_output_protocol.py -v -s
 ```
 
-Scenario sets (pick with `--scenarios`):
+### Synthetic feed harness
 
-| Set | What it exercises |
+```bash
+.venv/bin/python examples/gen_synthetic.py --scenarios all  # regenerate fixtures
+.venv/bin/python examples/validate.py                       # run agent + diff
+.venv/bin/python examples/validate.py --offline /tmp/out.txt # diff captured output
+```
+
+Scenario sets:
+
+| Set | Exercises |
 |---|---|
-| `smoke`   | Known Xids (48, 79, 92), HARD_LOCKUP, MLX5_FW_FATAL |
-| `rma`     | Paired criticals on same BDF → must set `rma_candidate: true` |
-| `vfio`    | VFIO on: fabric-mgr + solo SXid suppressed; flip off → emitted |
-| `unknown` | Unknown Xid codes (must not invent severity), secret scrubbing, burst aggregation with truncation at 50 |
-| `all`     | All four, seeded independently for reproducibility |
+| `smoke` | Known Xids (48, 79, 92), HARD_LOCKUP, MLX5_FW_FATAL |
+| `rma` | Paired criticals on same BDF → must set `rma_candidate: true` |
+| `vfio` | VFIO on: fabric-mgr + solo SXid suppressed; flip off → emitted |
+| `unknown` | Unknown codes (no severity invention), secret scrubbing, burst aggregation + 50-finding cap |
+| `all` | All four, seeded independently |
 
-The golden uses partial matching: only fields named in `expected_findings` must
-match; the agent may include additional fields (count, first_seen, evidence,
-etc.). `_verbatim_must_not_contain` is a special key that asserts a secret was
-scrubbed from the emitted `evidence.verbatim`.
+The golden uses **partial matching**: every field in `expected_findings` must
+match the actual; the actual may include additional fields. The matcher
+enforces that each actual finding satisfies at most one expected (no
+double-counting). `_verbatim_must_not_contain` asserts a secret was scrubbed
+from `evidence.verbatim`.
+
+---
+
+## Benchmarks
+
+```bash
+# Record a baseline (3 signals, ~3 min, ~$0.30 of Max usage)
+RUN_LIVE_AGENT_TESTS=1 ANTHROPIC_API_KEY= BENCH_TAG=baseline \
+  .venv/bin/python -m pytest tests/test_perf_baseline.py -v -s
+
+# After a change to AGENT.md, re-run with a fresh tag
+BENCH_TAG=after-change … pytest tests/test_perf_baseline.py
+```
+
+Results append to `tests/bench_log.jsonl` (gitignored — append-only and grows
+on every live run).
+
+Recorded improvement from inlining catalog hot-tables into `AGENT.md`
+(measured on Haiku 4.5):
+
+| signal | baseline | optimised |
+|---|---|---|
+| hot Xid 48 | 41.3s / 7 turns / $0.089 | 8.5s / 1 turn / $0.024 |
+| cold Xid 119 | 45.5s / 6 turns / $0.094 | 12.3s / 1 turn / $0.022 |
+| log GPU_BUS_DOWN | 79.3s / 11 turns / $0.138 | 34.4s / 1 turn / $0.035 |
+
+---
+
+## Limitations
+
+- **Max-plan only as a PoC.** Max has a 5-hour rolling cap; long burns will
+  hit it. The same `runner.py` works with an API key (`export
+  ANTHROPIC_API_KEY=…`) for production deployment.
+- **Single-signal turns.** The agent processes one `SIGNAL` per turn and does
+  not currently correlate across signals beyond a single batch. Multi-archive
+  fingerprint correlation is referenced by the `fingerprint-correlation`
+  skill but the runner does not invoke it.
+- **No real archive parsing.** The agent reads raw log lines and Xid events
+  as text. It does not currently open `.tar.gz` gather-info archives — that
+  would be added at the shim layer feeding the FIFO.
+- **Provenance fields are forbidden in output** because the model would
+  otherwise hallucinate `prompt_hash`, `skills_loaded`, etc. The harness is
+  expected to add real provenance after the model emits.
+
+---
 
 ## Production path (post-PoC)
 
-Once the loop and skill behaviour are validated under Max, the move to production
-is a credentials swap, not a rewrite:
+The same `runner.py` works against a workspace API key — set
+`ANTHROPIC_API_KEY` and the SDK uses it. For Anthropic's hosted Managed
+Agents API instead, upload `skills/` as a custom bundle, create an agent
+with `system_prompt = AGENT.md`, and POST each feed block as a
+`user.message` event. The output contract is unchanged.
 
-1. Provision an Anthropic workspace API key (`sk-ant-...`).
-2. **Option A — keep this runner.py:** `export ANTHROPIC_API_KEY=...` and unset
-   the `claude` CLI login. Same code path, billed per-token.
-3. **Option B — Managed Agents API:** upload `agent/skills/` as a custom skill
-   bundle (one upload per skill subdir), create an agent with `system_prompt` =
-   `AGENT.md`, `skills` = the uploaded ids, `tools` = `agent_toolset_20260401`
-   (bash, read, glob, grep). Create a session, POST each feed block as a
-   `user.message` event to `/v1/agents/sessions/{id}/events` with header
-   `anthropic-beta: managed-agents-2026-04-01`, stream `agent.message` SSE
-   events back.
+---
 
-See `re/research-managed-agents.md` for the full event flow, pricing, and tool
-confirmation patterns.
+## License & attribution
+
+MIT for everything authored here ([`LICENSE`](LICENSE)). Catalog data was
+extracted from a publicly-distributed NexGenCloud support binary and is
+acknowledged in [`NOTICE.md`](NOTICE.md). NVIDIA Xid codes, Linux kernel log
+patterns, and the underlying conventions are public information.
+
+Built with [Anthropic's Claude Agent SDK](https://github.com/anthropics/claude-agent-sdk-python).
