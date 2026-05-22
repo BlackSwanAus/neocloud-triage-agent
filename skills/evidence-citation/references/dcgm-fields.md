@@ -1,6 +1,6 @@
 # DCGM Field Identifiers
 
-Reference for DCGM metrics used in Hyperstack findings. Do not invent field meanings; use these canonical definitions from NVIDIA documentation.
+Reference for DCGM metrics used in Neocloud findings. Do not invent field meanings; use these canonical definitions from NVIDIA documentation.
 
 **Source:** https://docs.nvidia.com/datacenter/dcgm/latest/api-reference/field-identifiers.html
 
@@ -49,7 +49,7 @@ If DCGM Health = **Fail** for >1 hour, escalate to RMA decision tree.
 ## Notes
 
 - **SBE rate:** Baseline <10/hour is normal. >50/hour for >1 week suggests memory degradation; >1000/hour = RMA candidate (needs corroborating signal).
-- **Retired pages:** Firmware-soft-retired memory due to SBE clustering. Hyperstack RMA threshold: >20. See `rma-decision` skill.
+- **Retired pages:** Firmware-soft-retired memory due to SBE clustering. Neocloud RMA threshold: >20. See `rma-decision` skill.
 - **NVLink:** H100 and B200 use NVLink5 (900 GB/s per link). Gen3/Gen4 degradation visible via bandwidth drop or CRC error spike.
 - **Thermal:** H100 max die temp ~85°C. Sustained >80°C during light load indicates cooling failure.
 

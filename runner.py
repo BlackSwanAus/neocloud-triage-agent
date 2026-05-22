@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Hyperstack Triage Agent — signal-feed loop.
+Neocloud Triage Agent — signal-feed loop.
 
 Reads SIGNAL blocks from a feed (stdin, file, or named pipe), forwards each to a
 long-lived Claude Agent SDK session loaded with the bundled triage skills, and
@@ -233,7 +233,7 @@ async def main_loop(feed: Path | None, model: str) -> int:
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description="Hyperstack triage agent loop")
+    ap = argparse.ArgumentParser(description="Neocloud triage agent loop")
     ap.add_argument(
         "--feed",
         type=Path,

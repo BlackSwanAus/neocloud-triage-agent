@@ -1,17 +1,17 @@
 ---
-name: terraform-hyperstack
-description: Generate or review Hyperstack HCL Terraform configurations using provider v1.50.2-alpha. Load when designing infrastructure, planning resource changes, or troubleshooting provider issues. Cross-reference against flavor capabilities and MCP tool equivalents to optimize cost and avoid conflicts.
+name: terraform-neocloud
+description: Generate or review Neocloud HCL Terraform configurations using provider v1.50.2-alpha. Load when designing infrastructure, planning resource changes, or troubleshooting provider issues. Cross-reference against flavor capabilities and MCP tool equivalents to optimize cost and avoid conflicts.
 ---
 
-# Terraform Hyperstack Provider (v1.50.2-alpha)
+# Terraform Neocloud Provider (v1.50.2-alpha)
 
 Provider: `NexGenCloud/terraform-provider-hyperstack` **v1.50.2-alpha**  
 Resources: 8 | Data sources: 24 | References: flavor, region, image, capabilities, MCP mapping
 
 ## When to Load This Skill
 
-- Generating HCL for Hyperstack infrastructure (VMs, clusters, volumes, keypairs)
-- Reviewing existing Terraform that targets Hyperstack
+- Generating HCL for Neocloud infrastructure (VMs, clusters, volumes, keypairs)
+- Reviewing existing Terraform that targets Neocloud
 - Planning single-resource changes (firewall rules, volume attachments)
 - Validating flavor selections against capabilities and constraints
 - Optimizing cost via MCP direct calls instead of plan/apply
@@ -19,7 +19,7 @@ Resources: 8 | Data sources: 24 | References: flavor, region, image, capabilitie
 **Do NOT load this skill for:**
 - Pure infrastructure reading (use `data "hyperstack_*"` instead)
 - Authentication/policy design (auth resources rarely used in TF)
-- Architecture discussions (load `hyperstack-triage` for operational context)
+- Architecture discussions (load `neocloud-triage` for operational context)
 
 ## Core Rules (in priority order)
 
@@ -322,4 +322,4 @@ resource "hyperstack_core_virtual_machine_sg_rule" "ssh" {
 - **`evidence-citation`:** Cite artifact path + line when citing constraint violations (e.g., "flavor-capabilities.tsv line 8: no-hibernation label")
 - **`ai-finding-format`:** Use provenance block schema for structured output
 - **`xid-catalog`:** Not applicable (provider level, not hardware)
-- **`hyperstack-triage`:** Load together when diagnosing infrastructure failures post-deploy
+- **`neocloud-triage`:** Load together when diagnosing infrastructure failures post-deploy

@@ -1,4 +1,4 @@
-# Terraform Resource/DataSource → Hyperstack MCP Tool Mapping
+# Terraform Resource/DataSource → Neocloud MCP Tool Mapping
 
 Maps each Terraform resource and data source to its direct MCP equivalent for optimization recommendations.
 
@@ -53,4 +53,4 @@ Maps each Terraform resource and data source to its direct MCP equivalent for op
 
 ## MCP Tool Inventory (38 total)
 
-See `hyperstack-mcp-tools.tsv` for full list of 38 Hyperstack MCP tools (20 read / 18 write).
+See `hyperstack-mcp-tools.tsv` for full list of 38 Neocloud MCP tools (20 read / 18 write).

@@ -1,11 +1,11 @@
 ---
 name: xid-catalog
-description: Look up NVIDIA Xid/SXid GPU error codes. Returns canonical name, severity, and Hyperstack action policy. Use whenever a numeric Xid code or SXid name appears in artifacts; do NOT guess from training memory.
+description: Look up NVIDIA Xid/SXid GPU error codes. Returns canonical name, severity, and Neocloud action policy. Use whenever a numeric Xid code or SXid name appears in artifacts; do NOT guess from training memory.
 ---
 
 # Xid / SXid Catalog (lookup-only)
 
-For every Xid code or SXid name encountered, resolve it with this skill instead of recalling from memory. NVIDIA's catalog drifts; Hyperstack overrides drift faster.
+For every Xid code or SXid name encountered, resolve it with this skill instead of recalling from memory. NVIDIA's catalog drifts; Neocloud overrides drift faster.
 
 ## Resolution order
 
@@ -37,11 +37,11 @@ code|name|severity|action
 
 ## Field semantics
 
-- `severity` — Hyperstack severity, **not** NVIDIA's. Already accounts for our overrides.
+- `severity` — Neocloud severity, **not** NVIDIA's. Already accounts for our overrides.
 - `action` — verb-prefixed canonical action. Use the exact verb in your finding output so the dashboard can route.
 - Action verbs: `none` `monitor` `restart-app` `reset-gpu` `reboot-node` `escalate-for-review` `contact-support`.
 
-## Hyperstack-specific rules
+## Neocloud-specific rules
 
 - **Single-signal rule.** A `critical` severity here authorises "investigate", **not** RMA. RMA requires the `rma-decision` skill's 2-signal test.
 - **VFIO exception.** When `manifest.json` shows `vfio_passthrough: true`, an SXid without a matching GPU Xid within 10 s is fabric isolation working — do not escalate. See `references/sxid.md`.

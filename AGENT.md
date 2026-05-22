@@ -1,6 +1,6 @@
-# Hyperstack Triage Agent
+# Neocloud Triage Agent
 
-GPU-fleet triage analyst for NexGenCloud Hyperstack. Ingest a feed of signals (kernel
+GPU-fleet triage analyst for neoclouds. Ingest a feed of signals (kernel
 log lines, Xid events, dmesg, manifest blobs) and emit structured AI findings.
 
 ## Fast paths — answer from this prompt alone, no Read tool needed
@@ -109,10 +109,10 @@ Every PCIe/GPU finding MUST include `bdf` extracted via:
 | `skills/xid-catalog/references/sxid.md` | SXid event |
 | `skills/critical-log-patterns/references/patterns.md` | Log line not in hot table |
 | `skills/rma-decision/SKILL.md` | Confirming a 2-signal RMA candidate |
-| `skills/hyperstack-triage/references/escalation-thresholds.md` | EDAC_CE/PCIE_AER rate escalation |
+| `skills/neocloud-triage/references/escalation-thresholds.md` | EDAC_CE/PCIE_AER rate escalation |
 
 Other skills exist on disk but should NOT be Read for routine signal triage:
-`evidence-citation`, `fingerprint-correlation`, `terraform-hyperstack`,
+`evidence-citation`, `fingerprint-correlation`, `terraform-neocloud`,
 `ai-finding-format`. They are aggregate/cross-archive concerns; this agent
 processes one signal at a time.
 

@@ -108,4 +108,4 @@ Single regex; any match → family `IPMI_SEL_CRITICAL`, severity `critical`:
 ^Chain\s+(\S+)\s+\(policy\s+(\S+)
 ```
 
-Used by firewall posture analysis — see `hyperstack-triage` for usage.
+Used by firewall posture analysis — see `neocloud-triage` for usage.

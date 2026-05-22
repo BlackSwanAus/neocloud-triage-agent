@@ -1,6 +1,6 @@
-# Hyperstack Archive Structure and Artifact Map
+# Neocloud Archive Structure and Artifact Map
 
-Standard layout for `support-YYYY-MM-DD.tar.gz` produced by Hyperstack gather-info.
+Standard layout for `support-YYYY-MM-DD.tar.gz` produced by Neocloud gather-info.
 
 ## Top-level files
 

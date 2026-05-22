@@ -33,7 +33,7 @@
     "model_version": "claude-sonnet-4-6",
     "prompt_hash": "abc123def456abc123def456abc123def456abc123def456abc123def456ab",
     "skills_loaded": [
-      "hyperstack-triage/v1.0",
+      "neocloud-triage/v1.0",
       "xid-catalog/v2.1",
       "evidence-citation/v1.0"
     ],
@@ -122,7 +122,7 @@ RMA-decision ran and determined this qualifies for `rma-candidate` (2-signal rul
     "model_version": "claude-sonnet-4-6",
     "prompt_hash": "def456abc123def456abc123def456abc123def456abc123def456abc123def4",
     "skills_loaded": [
-      "hyperstack-triage/v1.0",
+      "neocloud-triage/v1.0",
       "xid-catalog/v2.1",
       "evidence-citation/v1.0",
       "fingerprint-correlation/v1.2",
@@ -161,7 +161,7 @@ RMA-decision ran and determined this qualifies for `rma-candidate` (2-signal rul
 For both examples, verify:
 - ✓ All required top-level fields present
 - ✓ `family` is from the canonical enum (not free-form)
-- ✓ `severity` conforms to `hyperstack-triage` escalation table
+- ✓ `severity` conforms to `neocloud-triage` escalation table
 - ✓ `action` verb is from xid-catalog's canonical list
 - ✓ Every evidence citation has `artifact` + `line` (no missing paths)
 - ✓ `rma_verdict` block present only if rma-decision ran

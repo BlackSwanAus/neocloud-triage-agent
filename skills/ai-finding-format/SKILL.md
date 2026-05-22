@@ -18,7 +18,7 @@ Every finding must include:
 - **`archive_id`** (UUID) — which support archive this finding came from
 - **`family`** (string, enum) — stable code from canonical families: `XID`, `ECC_CE`, `ECC_UE`, `EDAC_CE`, `EDAC_UE`, `PCIE_AER_FATAL`, `PCIE_AER_NONFATAL`, `NVLINK_*`, `THERMAL_*`, `KERNEL_PANIC`, `HARD_LOCKUP`, `GPU_BUS_DOWN`, `IPMI_SEL_CRITICAL`, `SMART_*`, etc. Never invent.
 - **`code`** (int for Xid; string for named families) — numeric XID or symbolic name
-- **`severity`** (enum: `info`, `warning`, `alert`, `critical`) — from `hyperstack-triage` escalation table, not raw defaults
+- **`severity`** (enum: `info`, `warning`, `alert`, `critical`) — from `neocloud-triage` escalation table, not raw defaults
 - **`confidence`** (enum: `low`, `medium`, `high`) — trust in the evidence
 - **`action`** (enum: `none`, `monitor`, `restart-app`, `reset-gpu`, `reboot-node`, `escalate-for-review`, `contact-support`, `tune-workload`) — canonical verb from `xid-catalog`
 - **`evidence`** (array of objects) — each cites an artifact path + line number with `{artifact, line, verbatim}`
@@ -39,7 +39,7 @@ Every finding must include:
 **Provenance block** (REQUIRED for every finding):
 - `model_version` — Claude model ID, e.g. `claude-sonnet-4-6`
 - `prompt_hash` — SHA256 of system prompt + skills loaded (enables eval reproducibility)
-- `skills_loaded` — array of skill names + versions, matching actual directory names: `["hyperstack-triage/v1.0", "xid-catalog/v2.1", "evidence-citation/v1.0"]`
+- `skills_loaded` — array of skill names + versions, matching actual directory names: `["neocloud-triage/v1.0", "xid-catalog/v2.1", "evidence-citation/v1.0"]`
 - `mcp_tools_called` — count by tool name: `{"search_by_fingerprint": 3, "preview_artifact": 7}`
 - `created_at` — ISO 8601 timestamp
 
@@ -57,7 +57,7 @@ Every finding must include:
 2. **Action verb must match xid-catalog.** Verb is a routing signal downstream.
 3. **Evidence without artifact is forbidden.** Every citation must have artifact + line.
 4. **RMA verdict only from rma-decision.** Never author your own verdict.
-5. **Severity conforms to hyperstack-triage table.** Use escalation rules; don't override.
+5. **Severity conforms to neocloud-triage table.** Use escalation rules; don't override.
 6. **Binary RMA gating.** Verdict is `none` | `monitor` | `investigate` | `rma-candidate` | `rma-urgent`. Not `awaiting-review` or custom values.
 
 ## Worked Examples

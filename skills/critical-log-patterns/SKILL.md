@@ -1,6 +1,6 @@
 ---
 name: critical-log-patterns
-description: Canonical regex patterns Hyperstack uses to detect critical kernel/syslog/journal events. Load only when the hyperstack-triage skill has determined that raw-log fallback is needed; provides families, regexes, and severities.
+description: Canonical regex patterns Neocloud uses to detect critical kernel/syslog/journal events. Load only when the neocloud-triage skill has determined that raw-log fallback is needed; provides families, regexes, and severities.
 ---
 
 # Critical Log Patterns
@@ -43,7 +43,7 @@ XFS_CRC_ERROR           | XFS \(\S+\): Metadata CRC error                       
 FS_REMOUNT_RO           | Remounting filesystem read-only                             | critical
 ```
 
-`*` `EDAC_CE` upgrades to `alert` at >50/day per `hyperstack-triage` escalation table.
+`*` `EDAC_CE` upgrades to `alert` at >50/day per `neocloud-triage` escalation table.
 `**` `PCIE_AER_CORRECTED` upgrades to `warning` at >20/24h, `alert` at >50/24h.
 
 ## BDF extraction

@@ -1,4 +1,4 @@
-# Hyperstack Triage Agent
+# Neocloud Triage Agent
 
 A long-running Claude agent that consumes a feed of GPU-fleet signals
 (kernel logs, NVIDIA Xid events, manifest metadata) and emits structured
@@ -123,12 +123,12 @@ The agent ships with eight skill packs under `skills/`. Most operate as
 |---|---|---|
 | `xid-catalog` | Xid code → name/severity/action | Code not in inlined hot table |
 | `critical-log-patterns` | Regex → log family/severity | Log line not matching inlined patterns |
-| `hyperstack-triage` | Operating procedure, escalation thresholds | Rate-based severity upgrade |
+| `neocloud-triage` | Operating procedure, escalation thresholds | Rate-based severity upgrade |
 | `evidence-citation` | Artifact paths, secret-scrub patterns | Building `evidence` block |
 | `ai-finding-format` | JSON schema + struct shapes | Output validation |
 | `rma-decision` | 2-signal RMA gate, decision tree | Confirming RMA candidacy |
 | `fingerprint-correlation` | Cross-archive dedup heuristics | Aggregate analysis (not single-signal) |
-| `terraform-hyperstack` | VM provisioning schema | Manifest/topology queries |
+| `terraform-neocloud` | VM provisioning schema | Manifest/topology queries |
 
 Each skill has two flavours of reference data side-by-side: the curated
 `references/<name>.{tsv,md}` (selective, with operator overrides) and the

@@ -85,7 +85,7 @@ For **partial/redacted** evidence (artifact damaged or truncated):
 - ❌ Citing `triage/_data/` without first checking if the triage collector succeeded (see `report.ndjson` status).
 - ❌ Unsourced "training memory" claims (DCGM field meanings, Xid codes, thermal thresholds). Use `xid-catalog` and `references/dcgm-fields.md`.
 
-## Hyperstack artifact paths
+## Neocloud artifact paths
 
 Common paths; read `references/artifact-map.md` for the full list:
 
@@ -116,6 +116,6 @@ Before emitting a finding:
 ## References
 
 - `references/dcgm-fields.md` — DCGM field IDs and meanings (GPU_UTIL, FB_USED, ECC_ERRORS, NVLINK_BANDWIDTH, RETIRED_PAGES, etc.)
-- `references/artifact-map.md` — Hyperstack archive structure; triage family → raw-file mapping
+- `references/artifact-map.md` — Neocloud archive structure; triage family → raw-file mapping
 - `references/secret-suppression.md` — PII/credential regex patterns to redact before emitting verbatim
 - `references/json-path-examples.md` — JSONPath syntax for xid_events.json, ecc_events.json, thermal_anomalies.json

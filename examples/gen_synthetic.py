@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Synthetic signal-feed generator for the Hyperstack triage agent.
+Synthetic signal-feed generator for the Neocloud triage agent.
 
 Emits a deterministic mix of:
   - Xid events (known + unknown codes)

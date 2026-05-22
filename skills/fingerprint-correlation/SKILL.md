@@ -1,6 +1,6 @@
 ---
 name: fingerprint-correlation
-description: Use when per-archive triage (via hyperstack-triage skill) has produced ≥warning findings. Correlates findings across archives via MCP dashboard queries to detect recurrence, multi-tenant colocations, and novel emergent issues. Returns correlation signals that feed rma-decision and ai-finding-format skills.
+description: Use when per-archive triage (via neocloud-triage skill) has produced ≥warning findings. Correlates findings across archives via MCP dashboard queries to detect recurrence, multi-tenant colocations, and novel emergent issues. Returns correlation signals that feed rma-decision and ai-finding-format skills.
 ---
 
 # Fingerprint Correlation
@@ -9,7 +9,7 @@ Single-archive findings are ambiguous: a GPU Xid on one host could be an isolate
 
 ## When to invoke
 
-Load this skill **after** hyperstack-triage has produced findings. Specifically:
+Load this skill **after** neocloud-triage has produced findings. Specifically:
 
 - per-archive severity ≥ **warning** (do not query on healthy/info)
 - MCP dashboard tools available (`search_by_fingerprint`, `find_similar_archives`, `recent_archives`)
@@ -106,13 +106,13 @@ See `references/time-window-heuristics.md` for extended decision matrix.
 
 ## Integration with other skills
 
-- **Input:** Finding with `issue_fingerprint` from hyperstack-triage
+- **Input:** Finding with `issue_fingerprint` from neocloud-triage
 - **Depends on:** MCP dashboard (`search_by_fingerprint`, `find_similar_archives`, `recent_archives`)
 - **Output to:** rma-decision (correlation_signals feed the 2-signal rule), ai-finding-format (to populate evidence and recommendation fields)
 
 Workflow:
 ```
-hyperstack-triage (per-archive) 
+neocloud-triage (per-archive) 
   → fingerprint-correlation (cross-archive query + signal generation)
     → rma-decision (use correlation_signals for 2-signal verdict)
     → ai-finding-format (embed signals in finding JSON for dashboard write-back)
@@ -139,7 +139,7 @@ The agent's claim authority is the MCP result, not training data or external kno
 ## References
 
 - **rma-decision** — consumes correlation_signals; applies the 2-signal rule
-- **hyperstack-triage** — produces per-archive findings with fingerprints
+- **neocloud-triage** — produces per-archive findings with fingerprints
 - **ai-finding-format** — formats correlated findings for dashboard write-back
 - **research-neocloud-ops.md** — Section 4 (Cross-archive correlation patterns), Section 5.3 (thermal clustering heuristics)
 - `references/time-window-heuristics.md` — extended time-window lookup table

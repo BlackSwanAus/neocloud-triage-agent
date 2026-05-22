@@ -113,7 +113,7 @@ runner.py ── one block per turn ──> ClaudeSDKClient ── claude CLI �
 ### `skills/` provenance
 
 Each skill has two reference flavours co-located:
-- `references/<name>.{tsv,md}` — curated, with Hyperstack-specific overrides
+- `references/<name>.{tsv,md}` — curated, with Neocloud-specific overrides
   (severity bumps, action verbs, escalation rules)
 - `references/source-<name>.{tsv,json,txt}` — extracted from the Go source
   (`hyperstack-support-scripts`), authoritative catalog

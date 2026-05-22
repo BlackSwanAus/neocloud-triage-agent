@@ -1,9 +1,9 @@
 ---
-name: hyperstack-triage
-description: Methodology for triaging a Hyperstack gather-info archive. Defines the strict artifact read-order and the severity escalation table. Load whenever you start analysing an archive_id; controls workflow, not lookup.
+name: neocloud-triage
+description: Methodology for triaging a Neocloud gather-info archive. Defines the strict artifact read-order and the severity escalation table. Load whenever you start analysing an archive_id; controls workflow, not lookup.
 ---
 
-# Hyperstack Triage Workflow
+# Neocloud Triage Workflow
 
 Triage is **read-order disciplined**: structured signals supersede raw logs. Cracking open a journal file before checking pre-classified findings is the most common rookie error and the source of most false RMAs.
 
@@ -17,7 +17,7 @@ Triage is **read-order disciplined**: structured signals supersede raw logs. Cra
 
 If you find yourself at step 5 without first confirming the artifact is missing at step 2, stop and re-read `report.ndjson`.
 
-## Classification (the only severities Hyperstack uses)
+## Classification (the only severities Neocloud uses)
 
 ```
 healthy   no critical/warning findings; ECC SBE < 10/day; no Xid in 30 days
@@ -68,7 +68,7 @@ emit findings using ai-finding-format skill
 - Never recommend RMA from this skill — defer to `rma-decision`.
 - If a finding upgrades or downgrades from a default, set `severity_changed_reason`.
 
-## Hyperstack-specific tuning
+## Neocloud-specific tuning
 
 - Multi-GPU same Xid on 3+ devices on one node → **node-level** finding, not per-GPU. Tag `node_level: true`. Likely thermal/power, not GPU defect.
 - `nvidia-fabricmanager.service` not running on a VFIO-passthrough host is expected; never a finding.

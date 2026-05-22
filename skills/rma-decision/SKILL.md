@@ -1,6 +1,6 @@
 ---
 name: rma-decision
-description: Decide whether a finding qualifies for RMA. Use only after the hyperstack-triage skill has produced classified findings; never invoke from raw evidence. Outputs a verdict and the rule that triggered it.
+description: Decide whether a finding qualifies for RMA. Use only after the neocloud-triage skill has produced classified findings; never invoke from raw evidence. Outputs a verdict and the rule that triggered it.
 ---
 
 # RMA Decision
@@ -44,7 +44,7 @@ rma-urgent          | immediate workload migration + RMA       | on-call hardwar
 ## Decision tree
 
 ```
-input: classified findings from hyperstack-triage (post-escalation)
+input: classified findings from neocloud-triage (post-escalation)
 
 if any finding.severity == "critical":
     if any pair of distinct-family signals correlated within 24h:
