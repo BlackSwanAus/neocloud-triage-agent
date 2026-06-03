@@ -17,3 +17,6 @@ tests/bench_log.jsonl
 *.swo
 .idea/
 .vscode/
+
+# Agent harness local state (token metrics, hook/session state — not project data)
+.omx/
