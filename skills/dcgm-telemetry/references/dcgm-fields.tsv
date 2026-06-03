@@ -1,0 +1,15 @@
+metric	family	severity	action	threshold_note
+DCGM_FI_DEV_XID_ERRORS	XID	varies	varies	value is the Xid code; resolve via xid-catalog
+DCGM_FI_DEV_ECC_DBE_VOL_TOTAL	DCGM_ECC_DBE	critical	reset-gpu	DBE>0; RMA candidate (needs 2nd signal)
+DCGM_FI_DEV_ECC_SBE_VOL_TOTAL	DCGM_ECC_SBE	warning	monitor	escalate if >1000/hr sustained
+DCGM_FI_DEV_RETIRED_DBE	DCGM_RETIRED_PAGES	warning	monitor	>20 retired pages = RMA candidate
+DCGM_FI_DEV_RETIRED_PENDING	DCGM_RETIRED_PAGES	warning	reset-gpu	pending retirement needs reset to apply
+DCGM_FI_DEV_ROW_REMAP_FAILURE	DCGM_ROW_REMAP_FAIL	critical	reset-gpu	uncorrectable remap failure; RMA candidate
+DCGM_FI_DEV_PCIE_REPLAY_COUNTER	DCGM_PCIE_REPLAY	warning	monitor	>50 total = escalate; RMA if + Xid 79
+DCGM_FI_DEV_NVLINK_CRC_FLIT_ERROR_COUNT_TOTAL	DCGM_NVLINK_ERRORS	warning	contact-support	spike = link degradation; RMA if + Xid 149
+DCGM_FI_DEV_NVLINK_CRC_DATA_ERROR_COUNT_TOTAL	DCGM_NVLINK_ERRORS	warning	contact-support	same as flit error
+DCGM_FI_DEV_THERMAL_VIOLATION	DCGM_THERMAL_VIOLATION	warning	monitor	sustained = investigate cooling
+DCGM_FI_DEV_POWER_VIOLATION	DCGM_POWER_VIOLATION	warning	monitor	sustained = investigate power/PSU
+DCGM_FI_DEV_GPU_TEMP	DCGM_GPU_OVERTEMP	critical	reset-gpu	>=90C die temp (H100 slowdown ~85C)
+DCGM_FI_DEV_MEMORY_TEMP	DCGM_MEM_OVERTEMP	critical	reset-gpu	>=95C HBM temp
+DCGM_FI_DEV_CLOCK_THROTTLE_REASONS	DCGM_PERSISTENT_THROTTLE	warning	monitor	HW-fault bits set 3+ consecutive polls

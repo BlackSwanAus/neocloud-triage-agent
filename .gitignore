@@ -11,6 +11,11 @@ env/
 # Benchmark logs (live test output — appended to on every $0.08+ run)
 tests/bench_log.jsonl
 
+# DCGM poller runtime state (per-node memory; regenerated, never committed)
+dcgm.state
+dcgm.state.tmp
+*.dcgm.state
+
 # OS / editor
 .DS_Store
 *.swp

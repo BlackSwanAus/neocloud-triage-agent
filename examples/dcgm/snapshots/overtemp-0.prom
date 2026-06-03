@@ -1,0 +1,1 @@
+DCGM_FI_DEV_GPU_TEMP{gpu="2",UUID="GPU-2",pci_bus_id="00000000:65:00.0",device="nvidia2",modelName="NVIDIA H100 80GB HBM3"} 87

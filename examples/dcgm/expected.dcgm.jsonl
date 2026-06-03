@@ -1,0 +1,4 @@
+{"signal_id": "dcgm-00001", "note": "dbe \u2192 DCGM_ECC_DBE", "expected_findings": [{"family": "DCGM_ECC_DBE", "severity": "critical", "action": "reset-gpu", "bdf": "0000:18:00.0"}]}
+{"signal_id": "dcgm-00002", "note": "dbe \u2192 XID", "expected_findings": [{"family": "XID", "code": 48, "severity": "critical", "action": "reset-gpu", "bdf": "0000:18:00.0"}]}
+{"signal_id": "dcgm-00003", "note": "overtemp \u2192 DCGM_GPU_OVERTEMP", "expected_findings": [{"family": "DCGM_GPU_OVERTEMP", "severity": "critical", "action": "reset-gpu", "bdf": "0000:65:00.0"}]}
+{"signal_id": "dcgm-00004", "note": "throttle \u2192 DCGM_PERSISTENT_THROTTLE", "expected_findings": [{"family": "DCGM_PERSISTENT_THROTTLE", "severity": "warning", "action": "monitor", "bdf": "0000:9e:00.0"}]}

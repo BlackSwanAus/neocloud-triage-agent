@@ -143,17 +143,20 @@ support binary — see [`NOTICE.md`](NOTICE.md)).
 .
 ├── AGENT.md              Agent system prompt — read this before changing behaviour
 ├── runner.py             Feed-driven loop (stdin or FIFO → ClaudeSDKClient)
-├── skills/               Eight bundled skill packs (xid-catalog, log-patterns, …)
+├── dcgm_poller.py        DCGM-exporter telemetry poller (edge-detect → SIGNAL feed)
+├── skills/               Nine bundled skill packs (xid-catalog, dcgm-telemetry, …)
 ├── examples/
 │   ├── feed.sample.txt           Hand-written 5-signal feed
 │   ├── feed.synthetic.txt        Generated fixture (committed)
 │   ├── expected.synthetic.jsonl  Golden expectations (committed)
 │   ├── gen_synthetic.py          Deterministic generator (seed=42)
-│   └── validate.py               Runs runner + diffs against golden
+│   ├── validate.py               Runs runner + diffs against golden
+│   └── dcgm/                     DCGM fixtures: snapshots, feed, golden, validate_dcgm.py
 ├── tests/
 │   ├── test_validator.py         Parser + matcher unit tests
 │   ├── test_validator_hit_dup.py Regression: each actual matches at most one expected
 │   ├── test_validate_timeout.py  Subprocess timeout
+│   ├── test_dcgm_poller.py       DCGM poller: parse / edge-detect / state (unit)
 │   ├── test_sdk_smoke.py         Live: SDK + Max-auth smoke
 │   ├── test_output_protocol.py   Live: model still emits FINDING/END/READY
 │   └── test_perf_baseline.py     Live: per-signal wall / turns / cost
@@ -242,6 +245,45 @@ Zero-finding (benign or suppressed) signals emit just `FINDING <id>\nEND\nREADY`
 
 ---
 
+## GPU telemetry via DCGM-exporter
+
+`dcgm_poller.py` adds NVIDIA [`dcgm-exporter`](https://github.com/NVIDIA/dcgm-exporter)
+as a second signal source. It scrapes the exporter's Prometheus `/metrics`
+endpoint (or a fixture), **edge-detects** notable changes, and writes `SIGNAL`
+blocks into the same feed `runner.py` already consumes — the agent contract is
+unchanged. The poller does no classification; the agent classifies each DCGM
+signal against a new hot table in `AGENT.md`.
+
+Edge detection is what makes telemetry *valid* (one signal per real event, not
+one per scrape):
+
+| Metric class | Rule | Example |
+|---|---|---|
+| counters (ECC, PCIe replay, NVLink, thermal/power-violation, retired pages) | emit on increase; reset-safe | `ECC_DBE_VOL_TOTAL` 0→1 |
+| gauges (GPU/memory temp) | emit on below→above crossing; re-arm past hysteresis | `GPU_TEMP` ≥90 °C |
+| `XID_ERRORS` (value is a *code*, not a count) | emit on new non-zero code; delegate to the Xid table | code `48` → ECC_DBE |
+| `CLOCK_THROTTLE_REASONS` (bitmask) | emit only after HW-fault bits persist 3 polls | sustained thermal throttle |
+
+State is held in a small JSON file so the poller is restart-safe (a reported
+fault stays quiet until it recurs).
+
+```bash
+# one-shot against a fixture
+python dcgm_poller.py --fixture examples/dcgm/snapshots/dbe-1.prom --state /tmp/dcgm.state --once
+
+# live, continuous, into the runner's FIFO
+python dcgm_poller.py --endpoint http://localhost:9400/metrics \
+    --state /var/lib/triage/dcgm.state --interval 15 --out /var/run/triage.fifo &
+python runner.py --feed /var/run/triage.fifo
+```
+
+Fixtures live under `examples/dcgm/` (deterministic; regenerate with
+`python examples/dcgm/gen_dcgm_synthetic.py`). See
+[`docs/plans/2026-06-03-dcgm-exporter-integration-design.md`](docs/plans/2026-06-03-dcgm-exporter-integration-design.md)
+for the full design.
+
+---
+
 ## Tests
 
 ```bash
@@ -279,6 +321,21 @@ match the actual; the actual may include additional fields. The matcher
 enforces that each actual finding satisfies at most one expected (no
 double-counting). `_verbatim_must_not_contain` asserts a secret was scrubbed
 from `evidence.verbatim`.
+
+### DCGM telemetry harness
+
+```bash
+.venv/bin/python examples/dcgm/gen_dcgm_synthetic.py     # regenerate snapshots + feed + golden
+RUN_LIVE_AGENT_TESTS=1 ANTHROPIC_API_KEY= \
+  .venv/bin/python examples/dcgm/validate_dcgm.py        # run agent on the DCGM feed + diff
+```
+
+The poller's own logic (parse / edge-detect / state) is covered offline and for
+free by `tests/test_dcgm_poller.py` — no model calls. `validate_dcgm.py` is the
+live end-to-end check that the agent classifies emitted DCGM signals correctly.
+
+Scenarios: `dbe` (ECC DBE + XID-via-DCGM on one BDF), `overtemp` (gauge crossing
++ no-re-fire), `throttle` (3-poll persistence gate), `quiet` (no false positives).
 
 ---
 

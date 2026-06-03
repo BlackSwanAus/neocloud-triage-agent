@@ -69,6 +69,40 @@ NVIDIA_FABRIC_MANAGER_NOT_RUNNING | nvidia-fabricmanager.service: Unit not found
 
 For lines NOT matching, Read `skills/critical-log-patterns/references/patterns.md`.
 
+### DCGM-exporter telemetry hot table
+
+`dcgm-exporter` lines (`DCGM_FI_DEV_*{…} <value>`) arrive pre-filtered by the DCGM
+poller — every DCGM SIGNAL you receive is already a real edge event (a counter
+that increased, a threshold crossed, a persistent throttle), **not** a routine
+sample. Classify by metric name:
+
+```
+metric                                        | family                   | severity | action
+----------------------------------------------+--------------------------+----------+----------------
+DCGM_FI_DEV_XID_ERRORS                        | XID (code = sample value)| →Xid tbl | →Xid hot table
+DCGM_FI_DEV_ECC_DBE_VOL_TOTAL                 | DCGM_ECC_DBE             | critical | reset-gpu
+DCGM_FI_DEV_ECC_SBE_VOL_TOTAL                 | DCGM_ECC_SBE             | warning  | monitor
+DCGM_FI_DEV_RETIRED_DBE                       | DCGM_RETIRED_PAGES       | warning  | monitor
+DCGM_FI_DEV_ROW_REMAP_FAILURE                 | DCGM_ROW_REMAP_FAIL      | critical | reset-gpu
+DCGM_FI_DEV_PCIE_REPLAY_COUNTER               | DCGM_PCIE_REPLAY         | warning  | monitor
+DCGM_FI_DEV_NVLINK_CRC_FLIT_ERROR_COUNT_TOTAL | DCGM_NVLINK_ERRORS       | warning  | contact-support
+DCGM_FI_DEV_THERMAL_VIOLATION                 | DCGM_THERMAL_VIOLATION   | warning  | monitor
+DCGM_FI_DEV_POWER_VIOLATION                   | DCGM_POWER_VIOLATION     | warning  | monitor
+DCGM_FI_DEV_GPU_TEMP                          | DCGM_GPU_OVERTEMP        | critical | reset-gpu
+DCGM_FI_DEV_MEMORY_TEMP                       | DCGM_MEM_OVERTEMP        | critical | reset-gpu
+DCGM_FI_DEV_CLOCK_THROTTLE_REASONS            | DCGM_PERSISTENT_THROTTLE | warning  | monitor
+```
+
+- **XID via DCGM.** When the metric is `DCGM_FI_DEV_XID_ERRORS`, the sample value
+  IS the Xid code. Emit `family: XID, code: <value>` and resolve severity/action
+  from the **Xid hot table above** (value `48` → ECC_DBE → critical → reset-gpu).
+  Do not restate Xid severities from this table.
+- **DCGM BDF.** The `pci_bus_id="00000000:18:00.0"` label uses an 8-hex PCI
+  domain. Take the low 4 hex of the domain → canonical `0000:18:00.0` for `bdf`.
+- **Unknown metric.** A `DCGM_FI_DEV_*` not in this table → `family: UNKNOWN_DCGM`,
+  `severity: warning`, `action: escalate-for-review`. Never invent a severity.
+- For metric semantics not covered here, Read `skills/dcgm-telemetry/references/dcgm-fields.tsv`.
+
 ### BDF extraction
 
 Every PCIe/GPU finding MUST include `bdf` extracted via:
@@ -110,6 +144,7 @@ Every PCIe/GPU finding MUST include `bdf` extracted via:
 | `skills/critical-log-patterns/references/patterns.md` | Log line not in hot table |
 | `skills/rma-decision/SKILL.md` | Confirming a 2-signal RMA candidate |
 | `skills/neocloud-triage/references/escalation-thresholds.md` | EDAC_CE/PCIE_AER rate escalation |
+| `skills/dcgm-telemetry/references/dcgm-fields.tsv` | DCGM metric not in the telemetry hot table |
 
 Other skills exist on disk but should NOT be Read for routine signal triage:
 `evidence-citation`, `fingerprint-correlation`, `terraform-neocloud`,

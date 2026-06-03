@@ -52,16 +52,20 @@ def parse_agent_output(text: str) -> dict[str, list[dict]]:
 
 
 def run_agent(feed: Path, timeout: float = 120.0) -> str:
-    """Pipe `feed` into runner.py, capture stdout. Raises TimeoutExpired on hang."""
-    with feed.open("rb") as f:
-        proc = subprocess.run(
-            [sys.executable, str(RUNNER)],
-            stdin=f,
-            capture_output=True,
-            text=True,
-            check=False,
-            timeout=timeout,
-        )
+    """Feed `feed` into runner.py over a stdin pipe, capture stdout.
+
+    Uses input= (a real pipe) rather than a regular-file stdin: runner.py reads
+    its feed via asyncio.connect_read_pipe, which rejects regular files
+    ("Pipe transport is for pipes/sockets only"). Raises TimeoutExpired on hang.
+    """
+    proc = subprocess.run(
+        [sys.executable, str(RUNNER)],
+        input=feed.read_text(),
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=timeout,
+    )
     if proc.returncode != 0:
         sys.stderr.write(f"[validate] runner exited {proc.returncode}\n")
         sys.stderr.write(proc.stderr)

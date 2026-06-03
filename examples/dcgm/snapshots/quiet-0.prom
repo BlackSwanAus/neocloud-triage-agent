@@ -1,0 +1,6 @@
+DCGM_FI_DEV_GPU_TEMP{gpu="6",UUID="GPU-6",pci_bus_id="00000000:c1:00.0",device="nvidia6",modelName="NVIDIA H100 80GB HBM3"} 62
+DCGM_FI_DEV_ECC_DBE_VOL_TOTAL{gpu="6",UUID="GPU-6",pci_bus_id="00000000:c1:00.0",device="nvidia6",modelName="NVIDIA H100 80GB HBM3"} 0
+DCGM_FI_DEV_ECC_SBE_VOL_TOTAL{gpu="6",UUID="GPU-6",pci_bus_id="00000000:c1:00.0",device="nvidia6",modelName="NVIDIA H100 80GB HBM3"} 0
+DCGM_FI_DEV_XID_ERRORS{gpu="6",UUID="GPU-6",pci_bus_id="00000000:c1:00.0",device="nvidia6",modelName="NVIDIA H100 80GB HBM3"} 0
+DCGM_FI_DEV_PCIE_REPLAY_COUNTER{gpu="6",UUID="GPU-6",pci_bus_id="00000000:c1:00.0",device="nvidia6",modelName="NVIDIA H100 80GB HBM3"} 0
+DCGM_FI_DEV_CLOCK_THROTTLE_REASONS{gpu="6",UUID="GPU-6",pci_bus_id="00000000:c1:00.0",device="nvidia6",modelName="NVIDIA H100 80GB HBM3"} 0

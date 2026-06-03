@@ -123,9 +123,38 @@ files as the override layer. **Do not** add files to `skills/<name>/references/`
 without first asking whether the data belongs in the inlined hot tables in
 `AGENT.md` instead — every file read costs a turn.
 
+### DCGM telemetry path (`dcgm_poller.py`)
+
+A second signal *producer* in front of the existing pipeline. It scrapes a
+`dcgm-exporter` `/metrics` endpoint (or a `--fixture`), **edge-detects** notable
+changes, and writes `SIGNAL` blocks into the same feed `runner.py` consumes —
+the agent contract is unchanged. Key facts:
+
+- **The poller does no classification.** It only decides *when* a reading is a
+  new event (counter increase / gauge crossing / persistent throttle) and emits
+  the raw DCGM line. The agent classifies it via the **DCGM hot table in
+  `AGENT.md`**. Keep these halves separate: poller = "is this an event?", agent =
+  "what does it mean?".
+- **`DCGM_FI_DEV_XID_ERRORS` value is an Xid *code*, not a count.** The agent
+  emits `family: XID, code: <value>` and resolves severity/action from the
+  **existing Xid hot table** — the DCGM table never restates Xid severities.
+- **8-hex BDF gotcha.** dcgm-exporter's `pci_bus_id` has an 8-hex domain
+  (`00000000:18:00.0`); the agent's existing BDF regex would miss it, so
+  `AGENT.md` tells the agent to take the low 4 hex → `0000:18:00.0`. The poller
+  normalizes the same way for its state keys.
+- **Threshold values live in `dcgm_poller.py` `RULES` (source of truth).** The
+  `dcgm-telemetry` skill and `references/thresholds.md` document the same
+  numbers + rationale. Change one → change both.
+- **State file is gitignored and per-node.** Restart-safety depends on it; a
+  reported fault stays quiet until it recurs. Regenerate fixtures with
+  `examples/dcgm/gen_dcgm_synthetic.py` (deterministic — commit the diff).
+- **Poller logic is unit-tested offline** (`tests/test_dcgm_poller.py`, no model
+  calls); `examples/dcgm/validate_dcgm.py` is the gated live end-to-end check.
+
 ### Test layering
 
 - `test_validator*.py`, `test_validate_timeout.py` — pure unit, no SDK calls
+- `test_dcgm_poller.py` — pure unit: DCGM parse / edge-detect / state, no SDK calls
 - `test_sdk_smoke.py` — verifies SDK installed + Max auth works
 - `test_output_protocol.py` — verifies the model still emits the
   `FINDING/END/READY` contract after AGENT.md edits

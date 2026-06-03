@@ -1,0 +1,17 @@
+SIGNAL dcgm-00001
+# dcgm-exporter edge: counter DCGM_FI_DEV_ECC_DBE_VOL_TOTAL increased 0 -> 1 (delta 1)
+DCGM_FI_DEV_ECC_DBE_VOL_TOTAL{gpu="0",UUID="GPU-0",pci_bus_id="00000000:18:00.0",device="nvidia0",modelName="NVIDIA H100 80GB HBM3"} 1
+END
+SIGNAL dcgm-00002
+# dcgm-exporter edge: xid code 48 observed via DCGM_FI_DEV_XID_ERRORS
+DCGM_FI_DEV_XID_ERRORS{gpu="0",UUID="GPU-0",pci_bus_id="00000000:18:00.0",device="nvidia0",modelName="NVIDIA H100 80GB HBM3"} 48
+END
+SIGNAL dcgm-00003
+# dcgm-exporter edge: gauge DCGM_FI_DEV_GPU_TEMP 93 >= threshold 90
+DCGM_FI_DEV_GPU_TEMP{gpu="2",UUID="GPU-2",pci_bus_id="00000000:65:00.0",device="nvidia2",modelName="NVIDIA H100 80GB HBM3"} 93
+END
+SIGNAL dcgm-00004
+# dcgm-exporter edge: persistent HW throttle (reasons=0xe8) for 3 polls
+DCGM_FI_DEV_CLOCK_THROTTLE_REASONS{gpu="4",UUID="GPU-4",pci_bus_id="00000000:9e:00.0",device="nvidia4",modelName="NVIDIA H100 80GB HBM3"} 232
+END
+SHUTDOWN
