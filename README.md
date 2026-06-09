@@ -4,9 +4,30 @@ A long-running Claude agent that consumes a feed of GPU-fleet signals
 (kernel logs, NVIDIA Xid events, manifest metadata) and emits structured
 findings via the Claude Agent SDK.
 
-Not a production tool — an exploration of prompt-as-contract design, TDD
-against a non-deterministic backend, and measurement-driven prompt
-optimisation. See [`NOTICE.md`](NOTICE.md) for provenance.
+> **Status: work in progress.** This is an early build. Don't point it at a
+> live fleet yet.
+
+The aim is to automate the first pass of GPU-fleet triage in an NVIDIA
+neocloud environment: the part where an on-call engineer reads a wall of
+kernel logs and Xid events at 3am and decides what actually needs a human.
+At fleet scale one bad node emits thousands of lines. ECC double-bit errors,
+GPUs falling off the bus, PCIe AER storms, NVLink and fabric faults. Most of
+it is noise or known-benign; a few lines are a dead GPU that needs an RMA.
+
+The agent reads that raw feed and classifies each signal against NVIDIA's Xid
+code table and the common kernel-log fault families, then emits a structured
+finding: what broke, how severe, and what to do about it (monitor, reset the
+GPU, reboot the node, escalate). Getting the error codes right is the core of
+the problem. Xid 48 (ECC DBE) and Xid 79 (GPU off the bus) carry different
+severities and call for different actions, and that mapping has to be correct
+before any of the aggregation, suppression, or RMA logic matters.
+
+Today it runs as a proof of concept: one long-lived Claude session fed
+signals over a pipe, classifying in a single turn against inlined hot tables.
+What exists is the classification contract, a test harness built around a
+non-deterministic model, and a DCGM-exporter telemetry path. What's still
+missing is real gather-archive parsing, cross-node correlation at scale, and
+a hardened production runner. See [`NOTICE.md`](NOTICE.md) for provenance.
 
 ---
 
