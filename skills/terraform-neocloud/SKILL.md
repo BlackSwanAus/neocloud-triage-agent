@@ -5,7 +5,7 @@ description: Generate or review Neocloud HCL Terraform configurations using prov
 
 # Terraform Neocloud Provider (v1.50.2-alpha)
 
-Provider: `NexGenCloud/terraform-provider-hyperstack` **v1.50.2-alpha**  
+Provider: `Neocloud/terraform-provider-neocloud` **v1.50.2-alpha**  
 Resources: 8 | Data sources: 24 | References: flavor, region, image, capabilities, MCP mapping
 
 ## When to Load This Skill
@@ -17,7 +17,7 @@ Resources: 8 | Data sources: 24 | References: flavor, region, image, capabilitie
 - Optimizing cost via MCP direct calls instead of plan/apply
 
 **Do NOT load this skill for:**
-- Pure infrastructure reading (use `data "hyperstack_*"` instead)
+- Pure infrastructure reading (use `data "neocloud_*"` instead)
 - Authentication/policy design (auth resources rarely used in TF)
 - Architecture discussions (load `neocloud-triage` for operational context)
 
@@ -38,12 +38,12 @@ Before emitting any resource with a `flavor_name`:
 
 ### 2. Image Validation (MANDATORY)
 
-- **Never hardcode image IDs.** Use computed output from `data "hyperstack_core_images"`:
+- **Never hardcode image IDs.** Use computed output from `data "neocloud_core_images"`:
   ```hcl
-  data "hyperstack_core_images" {}
+  data "neocloud_core_images" {}
   
-  resource "hyperstack_core_virtual_machine" "example" {
-    image_name = data.hyperstack_core_images.images[0].name
+  resource "neocloud_core_virtual_machine" "example" {
+    image_name = data.neocloud_core_images.images[0].name
   }
   ```
 - If image_name is user-provided, cross-check against `references/image-matrix.tsv` (auto-populated at deploy time).
@@ -53,24 +53,24 @@ Before emitting any resource with a `flavor_name`:
 
 - **Never hardcode region IDs.** Use:
   ```hcl
-  data "hyperstack_core_environment" "target" {
+  data "neocloud_core_environment" "target" {
     name = var.environment_name  # CANADA-1, NORWAY-1, US-1
   }
   
-  resource "hyperstack_core_virtual_machine" "example" {
-    environment_name = data.hyperstack_core_environment.target.name
+  resource "neocloud_core_virtual_machine" "example" {
+    environment_name = data.neocloud_core_environment.target.name
   }
   ```
 - Allowed regions (from `references/region-matrix.tsv`): `CANADA-1` (primary), `NORWAY-1` (EU, RTX A4000 / CPU-only), `US-1` (A100-SXM4 limited).
-- **Refuse hardcoded region strings in code.** Always use `data "hyperstack_core_environment"`.
+- **Refuse hardcoded region strings in code.** Always use `data "neocloud_core_environment"`.
 
 ### 4. Stock Pre-check (STRONGLY RECOMMENDED)
 
 When plan requires ≥2 of any single GPU SKU (e.g., H100x8, A100x4):
 
 ```hcl
-data "hyperstack_core_stocks" "check" {
-  region = data.hyperstack_core_environment.target.name
+data "neocloud_core_stocks" "check" {
+  region = data.neocloud_core_environment.target.name
 }
 
 # In plan output, verify stock > 0 for all required flavors before apply
@@ -81,12 +81,12 @@ Run `./scripts/stocks-precheck.sh terraform.tfplan` before high-cost apply.
 ### 5. Volume Lifecycle Protection (MANDATORY)
 
 Add `lifecycle { prevent_destroy = true }` to:
-- `resource "hyperstack_core_volume"`
-- `resource "hyperstack_core_keypair"`
-- `resource "hyperstack_core_cluster"`
+- `resource "neocloud_core_volume"`
+- `resource "neocloud_core_keypair"`
+- `resource "neocloud_core_cluster"`
 
 ```hcl
-resource "hyperstack_core_volume" "data" {
+resource "neocloud_core_volume" "data" {
   name              = "app-data"
   environment_name  = "CANADA-1"
   size_gb           = 500
@@ -103,8 +103,8 @@ resource "hyperstack_core_volume" "data" {
 - **Every `core_virtual_machine` must have ≥1 `core_virtual_machine_sg_rule`.**
 - **Refuse any rule with CIDR `0.0.0.0/0` (open to internet) unless user provides `# allow-open-internet` comment override.**
   ```hcl
-  resource "hyperstack_core_virtual_machine_sg_rule" "ssh_restricted" {
-    vm_id       = hyperstack_core_virtual_machine.example.id
+  resource "neocloud_core_virtual_machine_sg_rule" "ssh_restricted" {
+    vm_id       = neocloud_core_virtual_machine.example.id
     direction   = "ingress"
     protocol    = "tcp"
     port_range_min = 22
@@ -112,8 +112,8 @@ resource "hyperstack_core_volume" "data" {
     cidr        = "203.0.113.0/24"  # ✓ Restricted
   }
   
-  resource "hyperstack_core_virtual_machine_sg_rule" "http_open" {
-    vm_id            = hyperstack_core_virtual_machine.example.id
+  resource "neocloud_core_virtual_machine_sg_rule" "http_open" {
+    vm_id            = neocloud_core_virtual_machine.example.id
     direction        = "ingress"
     protocol         = "tcp"
     port_range_min   = 80
@@ -129,7 +129,7 @@ resource "hyperstack_core_volume" "data" {
 
 - **Adding a firewall rule:** Use MCP `add_firewall_rule` instead of `terraform apply`
   ```
-  "Instead of terraform apply, call: hyperstack mcp call add_firewall_rule 
+  "Instead of terraform apply, call: neocloud mcp call add_firewall_rule 
    --vm-id 12345 --protocol tcp --port-min 443 --port-max 443 --cidr 203.0.113.0/24"
   ```
 - **Attaching a volume:** Use MCP `attach_volume_to_vm`
@@ -141,14 +141,14 @@ See `references/mcp-tool-mapping.md` for full equivalence table.
 ### 8. Additive-Only Changes (MANDATORY)
 
 **Never emit `terraform destroy` or any code that deletes resources.** Only generate:
-- `resource "hyperstack_*"` (new)
-- `data "hyperstack_*"` (lookup)
+- `resource "neocloud_*"` (new)
+- `data "neocloud_*"` (lookup)
 - Updates to existing resource attributes (computed outputs excluded)
 
 If user requests deletion, respond:
 ```
 "Deletion requests are manual; use: terraform destroy -target resource.name
- or call hyperstack mcp delete_vm / delete_volume directly."
+ or call neocloud mcp delete_vm / delete_volume directly."
 ```
 
 ### 9. Provider Version Pin (MANDATORY)
@@ -158,8 +158,8 @@ Every generated Terraform file must include:
 ```hcl
 terraform {
   required_providers {
-    hyperstack = {
-      source  = "NexGenCloud/terraform-provider-hyperstack"
+    neocloud = {
+      source  = "Neocloud/terraform-provider-neocloud"
       version = "~> 1.50.2-alpha"
     }
   }
@@ -173,7 +173,7 @@ Cross-reference user requests against `flavor-capabilities.tsv`:
 | Label | Meaning | Refuse Request If |
 |-------|---------|-------------------|
 | `network_optimised` | SR-IOV high-speed networking | User doesn't need; choose non-opt variant for cost |
-| `no-hibernation` | Cannot suspend to disk | User requests `resource.hyperstack_core_virtual_machine` with hibernation ops |
+| `no-hibernation` | Cannot suspend to disk | User requests `resource.neocloud_core_virtual_machine` with hibernation ops |
 | `no-snapshot` | No point-in-time backup | User requests volume snapshots for flavor with label |
 | `local-storage-only` | Cannot boot from Ceph | User sets `create_bootable_volume = true` on restricted flavor |
 | `api-only` | Not in UI; API-only discoverable | Note limitation; user must use API/TF to provision |
@@ -238,24 +238,24 @@ See `ai-finding-format` skill for schema.
 ```hcl
 terraform {
   required_providers {
-    hyperstack = {
-      source  = "NexGenCloud/terraform-provider-hyperstack"
+    neocloud = {
+      source  = "Neocloud/terraform-provider-neocloud"
       version = "~> 1.50.2-alpha"
     }
   }
 }
 
-data "hyperstack_core_environment" "canada" {
+data "neocloud_core_environment" "canada" {
   name = "CANADA-1"
 }
 
-data "hyperstack_core_stocks" "check" {
-  region = data.hyperstack_core_environment.canada.name
+data "neocloud_core_stocks" "check" {
+  region = data.neocloud_core_environment.canada.name
 }
 
-data "hyperstack_core_images" "ubuntu" {}
+data "neocloud_core_images" "ubuntu" {}
 
-resource "hyperstack_core_keypair" "admin" {
+resource "neocloud_core_keypair" "admin" {
   name       = "admin-key"
   public_key = var.admin_ssh_public_key
 
@@ -264,9 +264,9 @@ resource "hyperstack_core_keypair" "admin" {
   }
 }
 
-resource "hyperstack_core_volume" "data" {
+resource "neocloud_core_volume" "data" {
   name             = "app-data"
-  environment_name = data.hyperstack_core_environment.canada.name
+  environment_name = data.neocloud_core_environment.canada.name
   size_gb          = 500
   volume_type      = "SSD"
 
@@ -275,24 +275,24 @@ resource "hyperstack_core_volume" "data" {
   }
 }
 
-resource "hyperstack_core_virtual_machine" "compute" {
+resource "neocloud_core_virtual_machine" "compute" {
   name                = "h100-compute"
   flavor_name         = "n3-H100x2"
-  environment_name    = data.hyperstack_core_environment.canada.name
-  image_name          = data.hyperstack_core_images.ubuntu.images[0].name
+  environment_name    = data.neocloud_core_environment.canada.name
+  image_name          = data.neocloud_core_images.ubuntu.images[0].name
   assign_floating_ip  = true
   create_bootable_volume = false
 
-  depends_on = [hyperstack_core_keypair.admin, data.hyperstack_core_stocks.check]
+  depends_on = [neocloud_core_keypair.admin, data.neocloud_core_stocks.check]
 }
 
-resource "hyperstack_core_volume_attachment" "data_mount" {
-  vm_id     = hyperstack_core_virtual_machine.compute.id
-  volume_id = hyperstack_core_volume.data.id
+resource "neocloud_core_volume_attachment" "data_mount" {
+  vm_id     = neocloud_core_virtual_machine.compute.id
+  volume_id = neocloud_core_volume.data.id
 }
 
-resource "hyperstack_core_virtual_machine_sg_rule" "ssh" {
-  vm_id          = hyperstack_core_virtual_machine.compute.id
+resource "neocloud_core_virtual_machine_sg_rule" "ssh" {
+  vm_id          = neocloud_core_virtual_machine.compute.id
   direction      = "ingress"
   protocol       = "tcp"
   port_range_min = 22

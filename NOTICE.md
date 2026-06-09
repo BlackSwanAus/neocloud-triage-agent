@@ -15,15 +15,15 @@ Released under MIT (see `LICENSE`):
 ## Provenance of `skills/` reference data
 
 The `skills/<name>/references/source-*.{tsv,json,txt}` files were extracted
-from a publicly-distributed NexGenCloud support binary
-(`hyperstack-support-scripts`) by parsing exported strings and Go AST nodes.
+from a publicly-distributed vendor support binary
+(the vendor support-scripts repo) by parsing exported strings and Go AST nodes.
 They reflect that binary's catalog of NVIDIA Xid codes, kernel log regex
 patterns, evidence-collection paths, and JSON struct shapes.
 
 The curated `references/*.{tsv,md}` files (without the `source-` prefix) are
 a selective curation of the above, with notes on operator overrides and
 escalation behaviour. Severity classifications are an interpretation — they
-are not authoritative NexGenCloud policy.
+are not authoritative vendor policy.
 
 ## Underlying public data
 
@@ -34,12 +34,11 @@ are not authoritative NexGenCloud policy.
 ## Not in this repository
 
 - No customer data, telemetry, or archives.
-- No NexGenCloud-internal source code or documentation.
+- No vendor-internal source code or documentation.
 - No credentials, API keys, or production endpoints.
 
 ## Trademarks
 
-"Hyperstack" and "NexGenCloud" remain the property of their respective
-owners. "Claude" is a trademark of Anthropic PBC. "NVIDIA", "Xid", "SXid",
+"Claude" is a trademark of Anthropic PBC. "NVIDIA", "Xid", "SXid",
 and "NVLink" are trademarks of NVIDIA Corporation. Use of these names does
 not imply affiliation or endorsement.

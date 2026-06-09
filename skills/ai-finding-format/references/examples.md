@@ -57,7 +57,7 @@
 
 ## Example B: Multi-Tenant Correlated Finding with RMA Verdict
 
-**Scenario:** Archive `660e8400-e29b-41d4-a716-446655440001` (hostname: `hyperstack-gpu-02.lab`) shows both:
+**Scenario:** Archive `660e8400-e29b-41d4-a716-446655440001` (hostname: `neocloud-gpu-02.lab`) shows both:
 1. Xid 79 (GPU Fallen Off Bus) at 2026-05-18T14:05:30Z
 2. PCIE_AER_FATAL error at 2026-05-18T14:05:35Z (5 seconds later)
 

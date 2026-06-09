@@ -69,6 +69,6 @@ See `references/examples.md`:
 ## Complete Schema
 
 Full JSON Schema (draft 2020-12): `references/ai-finding.schema.json`  
-$id: `https://hyperstack.cloud/schemas/ai-finding/v1`
+$id: `https://neocloud.example/schemas/ai-finding/v1`
 
 Use this for dashboard validator and agent pre-flight checks.

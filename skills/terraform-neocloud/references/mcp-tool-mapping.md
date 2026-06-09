@@ -35,7 +35,7 @@ Maps each Terraform resource and data source to its direct MCP equivalent for op
 | `core_firewall_protocols` | (implicit) | Static protocol list; no MCP equivalent |
 | `core_flavors` | `list_flavors` | Enumerate flavors with capabilities |
 | `core_gpus` | (implicit) | GPU type enumeration; no MCP equivalent |
-| `core_images` | (implicit) | OS images; recommend `data "hyperstack_core_images"` computed |
+| `core_images` | (implicit) | OS images; recommend `data "neocloud_core_images"` computed |
 | `core_keypair` | (implicit) | Keypair lookup; no direct MCP read |
 | `core_keypairs` | (implicit) | Enumerate keypairs; no MCP equivalent |
 | `core_regions` | `list_environments` | Region enumeration (alias for environments) |
@@ -53,4 +53,4 @@ Maps each Terraform resource and data source to its direct MCP equivalent for op
 
 ## MCP Tool Inventory (38 total)
 
-See `hyperstack-mcp-tools.tsv` for full list of 38 Neocloud MCP tools (20 read / 18 write).
+See `neocloud-mcp-tools.tsv` for full list of 38 Neocloud MCP tools (20 read / 18 write).

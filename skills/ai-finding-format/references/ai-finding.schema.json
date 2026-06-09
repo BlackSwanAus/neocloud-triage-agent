@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://hyperstack.cloud/schemas/ai-finding/v1",
+  "$id": "https://neocloud.example/schemas/ai-finding/v1",
   "title": "Neocloud AI Finding",
   "description": "Canonical JSON structure for triage agent findings, validated on dashboard write-back.",
   "type": "object",

@@ -13,7 +13,7 @@ check_flavor_stocks() {
     local plan_json="$1"
     local region="$2"
 
-    # Extract all hyperstack_core_virtual_machine resources with their flavor_name and count
+    # Extract all neocloud_core_virtual_machine resources with their flavor_name and count
     # This is a simplified check; production should use terraform JSON plan parse
 
     python3 << 'PYTHON'
@@ -35,7 +35,7 @@ except Exception as e:
 # Count by flavor
 flavor_counts = {}
 for resource in plan.get('resource_changes', []):
-    if resource['type'] == 'hyperstack_core_virtual_machine':
+    if resource['type'] == 'neocloud_core_virtual_machine':
         if resource['change']['actions'][0] in ['create', 'no-op']:
             flavor = resource['change'].get('after', {}).get('flavor_name', 'unknown')
             flavor_counts[flavor] = flavor_counts.get(flavor, 0) + 1
@@ -46,9 +46,9 @@ if not flavor_counts:
 
 print("Flavor requirements:", flavor_counts, file=sys.stderr)
 
-# In production, call check_stocks MCP tool here via hyperstack CLI or API
+# In production, call check_stocks MCP tool here via neocloud CLI or API
 # Example:
-#   hyperstack mcp call check_stocks --region "$REGION"
+#   neocloud mcp call check_stocks --region "$REGION"
 # This would return stock levels per flavor and fail if any required flavor is out of stock.
 
 for flavor, count in flavor_counts.items():
@@ -61,15 +61,15 @@ PYTHON
 
 # Main entry point
 main() {
-    local region="${HYPERSTACK_REGION:-CANADA-1}"
+    local region="${NEOCLOUD_REGION:-CANADA-1}"
     local plan_file="${1:-}"
 
     if [ -z "$plan_file" ] || [ ! -f "$plan_file" ]; then
         echo "Usage: $0 <terraform.tfplan>"
         echo ""
         echo "Environment variables:"
-        echo "  HYPERSTACK_REGION: Region to check stocks (default: CANADA-1)"
-        echo "  HYPERSTACK_API_KEY: API key for stock checks"
+        echo "  NEOCLOUD_REGION: Region to check stocks (default: CANADA-1)"
+        echo "  NEOCLOUD_API_KEY: API key for stock checks"
         exit 1
     fi
 

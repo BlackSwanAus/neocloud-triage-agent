@@ -26,16 +26,20 @@ TRIAGE_MODEL=claude-sonnet-4-6 .venv/bin/python runner.py < …  # override mode
 
 ### Tests
 ```bash
-# Unit suite (14 tests, no model calls, ~1.5s)
+# Unit suite (32 tests, no model calls, ~1.8s)
 .venv/bin/python -m pytest tests/ --ignore=tests/test_sdk_smoke.py \
                                   --ignore=tests/test_output_protocol.py \
-                                  --ignore=tests/test_perf_baseline.py
+                                  --ignore=tests/test_perf_baseline.py \
+                                  --ignore=tests/test_tool_gate_security.py
 
 # Live SDK smoke (1 query, ~10s, uses Max session)
 RUN_LIVE_AGENT_TESTS=1 ANTHROPIC_API_KEY= .venv/bin/python -m pytest tests/test_sdk_smoke.py -v -s
 
 # Live output-protocol regression
 RUN_LIVE_AGENT_TESTS=1 ANTHROPIC_API_KEY= .venv/bin/python -m pytest tests/test_output_protocol.py -v -s
+
+# Live tool-gate security regression (proves Bash/Write stay blocked under injection)
+RUN_LIVE_AGENT_TESTS=1 ANTHROPIC_API_KEY= .venv/bin/python -m pytest tests/test_tool_gate_security.py -v -s
 
 # Single test
 .venv/bin/python -m pytest tests/test_validator.py::test_strips_code_fences -v
@@ -110,13 +114,36 @@ runner.py ── one block per turn ──> ClaudeSDKClient ── claude CLI �
    wrappers are tolerated. The validator does partial-match per expected finding,
    with **hit-tracking** — each actual finding can satisfy at most one expected.
 
+### Security model (tool gate)
+
+Raw feed text is **attacker-controllable** in production (it comes off log
+shims), so the triage session runs default-deny. Three layers in `runner.py`,
+all of which must stay aligned (`tests/test_tool_gate_security.py` is the live
+regression that proves it):
+
+1. **`setting_sources=[]`** is the load-bearing setting. It isolates the session
+   from `~/.claude/settings.json` — without it, a user's personal
+   `permissions.allow` (Bash, Write, Task, …) leaks in and overrides the
+   allowlist. The `test_user_settings_isolation` test guards exactly this.
+2. **`allowed_tools=TRIAGE_TOOL_ALLOWLIST`** (`Read`, `Glob`, `Grep` only) — the
+   sole tools the fallback catalog-read path needs. Under `setting_sources=[]`
+   this is a strict allowlist the CLI enforces *before* a tool runs.
+3. **`disallowed_tools=TRIAGE_TOOL_DENYLIST`** (Bash/Write/Edit/Task/WebFetch/…)
+   — defense-in-depth. Keep it current as the Claude Code tool surface grows.
+
+The `can_use_tool=triage_tool_gate` callback is plumbed but **does not fire**
+under CLI 2.1.143 + SDK 0.1.18 when tools are pre-classified — it's kept only as
+a forward-compat layer. Enforcement today is the CLI honoring (1)+(2)+(3); don't
+rely on the callback. Never relax `setting_sources=[]` or add a tool to the
+allowlist without re-running the live security test.
+
 ### `skills/` provenance
 
 Each skill has two reference flavours co-located:
 - `references/<name>.{tsv,md}` — curated, with Neocloud-specific overrides
   (severity bumps, action verbs, escalation rules)
 - `references/source-<name>.{tsv,json,txt}` — extracted from the Go source
-  (`hyperstack-support-scripts`), authoritative catalog
+  (the vendor support-scripts repo), authoritative catalog
 
 When NVIDIA's catalog drifts, regenerate `source-*` from upstream; treat curated
 files as the override layer. **Do not** add files to `skills/<name>/references/`
@@ -158,6 +185,9 @@ the agent contract is unchanged. Key facts:
 - `test_sdk_smoke.py` — verifies SDK installed + Max auth works
 - `test_output_protocol.py` — verifies the model still emits the
   `FINDING/END/READY` contract after AGENT.md edits
+- `test_tool_gate_security.py` — live: proves Bash/Write/Task stay blocked even
+  when the model is explicitly prompted to attempt them, and that
+  `setting_sources=[]` isolates user settings
 - `test_perf_baseline.py` — instrumentation, not pass/fail; records
   wall-time / turns / cost to `bench_log.jsonl`
 

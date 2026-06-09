@@ -67,4 +67,4 @@ If you upgraded the severity (e.g. `92` → `critical` because of >50/day rate),
 
 ## Source
 
-Catalog is generated from `customers/vm-troubleshooting/internal/triage/xidcatalog/catalog_generated.go` in `NexGenCloud/hyperstack-support-scripts`. When NVIDIA publishes new codes, the in-binary catalog updates; re-export to `references/codes.tsv`.
+Catalog is generated from `customers/vm-troubleshooting/internal/triage/xidcatalog/catalog_generated.go` in the vendor support-scripts repository. When NVIDIA publishes new codes, the in-binary catalog updates; re-export to `references/codes.tsv`.

@@ -395,7 +395,7 @@ with `system_prompt = AGENT.md`, and POST each feed block as a
 ## License & attribution
 
 MIT for everything authored here ([`LICENSE`](LICENSE)). Catalog data was
-extracted from a publicly-distributed NexGenCloud support binary and is
+extracted from a publicly-distributed vendor support binary and is
 acknowledged in [`NOTICE.md`](NOTICE.md). NVIDIA Xid codes, Linux kernel log
 patterns, and the underlying conventions are public information.
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Regenerate reference tables from Terraform provider schema.
-# Requires: terraform CLI, HYPERSTACK_API_KEY, GitHub CLI (gh)
+# Requires: terraform CLI, NEOCLOUD_API_KEY, GitHub CLI (gh)
 
 set -euo pipefail
 
@@ -20,8 +20,8 @@ if ! command -v gh &> /dev/null; then
     exit 1
 fi
 
-if [ -z "${HYPERSTACK_API_KEY:-}" ]; then
-    echo "Error: HYPERSTACK_API_KEY environment variable not set"
+if [ -z "${NEOCLOUD_API_KEY:-}" ]; then
+    echo "Error: NEOCLOUD_API_KEY environment variable not set"
     exit 1
 fi
 
@@ -37,15 +37,15 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    hyperstack = {
-      source  = "NexGenCloud/hyperstack"
+    neocloud = {
+      source  = "Neocloud/neocloud"
       version = "~> 1.50.2-alpha"
     }
   }
 }
 
-provider "hyperstack" {
-  # Uses HYPERSTACK_API_KEY environment variable
+provider "neocloud" {
+  # Uses NEOCLOUD_API_KEY environment variable
 }
 EOF
 
@@ -68,7 +68,7 @@ with open('provider_schema.json') as f:
 
 # Extract resources
 resources = []
-provider_schema = schema['provider_schemas'].get('registry.terraform.io/nexgencloud/hyperstack', {})
+provider_schema = schema['provider_schemas'].get('registry.terraform.io/neocloud/neocloud', {})
 resource_schemas = provider_schema.get('resource_schemas', {})
 
 for resource_type, resource_def in resource_schemas.items():

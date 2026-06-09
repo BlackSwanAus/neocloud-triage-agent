@@ -25,19 +25,19 @@ step 5: if any serial has ≥2 distinct tenants within 24 h → multi_tenant_col
   "occurrences": [
     {
       "archive_id": "550e8400-e29b-41d4-a716-446655440000",
-      "hostname": "hyperstack-gpu-01.lab",
+      "hostname": "neocloud-gpu-01.lab",
       "tenant_id": "customer-a",
       "uploaded_at": "2026-05-18T14:00:00Z"
     },
     {
       "archive_id": "660e8400-e29b-41d4-a716-446655440001",
-      "hostname": "hyperstack-gpu-01.lab",
+      "hostname": "neocloud-gpu-01.lab",
       "tenant_id": "customer-b",
       "uploaded_at": "2026-05-18T14:15:00Z"
     },
     {
       "archive_id": "770e8400-e29b-41d4-a716-446655440002",
-      "hostname": "hyperstack-gpu-01.lab",
+      "hostname": "neocloud-gpu-01.lab",
       "tenant_id": "customer-c",
       "uploaded_at": "2026-05-18T15:30:00Z"
     }

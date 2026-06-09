@@ -54,7 +54,7 @@ Append `correlation_signals` to the evidence object for each finding:
     {
       "type": "recurrence",
       "confidence": "high",
-      "evidence": "1 prior occurrence on hyperstack-gpu-01 on 2026-05-10",
+      "evidence": "1 prior occurrence on neocloud-gpu-01 on 2026-05-10",
       "recommendation": "upgrade severity to alert"
     },
     {
